@@ -1,0 +1,41 @@
+migrations/001_schema.sql
+  s_f9664ac6bf3134::t_8a59276b33465a 20
+src/ledger.ts
+  s_f9664ac6bf3134::t_9574f2a9fcd6f4 28-29,104,115-117,194-197,199-201,233-234,242-244,288,290-292,295-300
+tests/occurred-at.test.ts
+  s_f9664ac6bf3134::t_f044e5adb9426a 1-100
+AGENTS.md
+  s_ab92bfb3d6bd83::t_b6bb3f23ecf2e2 28-29
+AI-NOTES.md
+  s_ab92bfb3d6bd83::t_429e8ab7dbd33e 18
+GLOSSARY.md
+  s_ab92bfb3d6bd83::t_551f8464c5f210 96
+SPEC.md
+  s_ab92bfb3d6bd83::t_a4f303f7950218 54,56
+docs/adr/0005-movements-are-not-dated-before-the-card-or-the-redemption.md
+  s_ab92bfb3d6bd83::t_67a3888b958f42 1-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "00545d65c3a56d30dca494dcfefe2386895e0699",
+  "prompts": {},
+  "sessions": {
+    "s_ab92bfb3d6bd83": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "72e545d3-0734-4455-8355-99d4a50aa694",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    },
+    "s_f9664ac6bf3134": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b0139e10-0b8d-46d3-8517-6dbb13edc1e7",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
