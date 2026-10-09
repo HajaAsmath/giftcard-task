@@ -6,3 +6,4 @@ Mistakes the agent made while building this, logged as they happened, with the c
 |---|---|---|---|
 | 1 | 01 | Installed `typescript@latest` (7.x) alongside `ts-jest`, whose peer range is `>=4.3 <7`. | Pinned `typescript@5`. Check peer ranges before installing. |
 | 2 | 01 | Installed `@testcontainers/postgresql@latest` (12.x), which pulls in `undici@8` that requires Node >= 22; the spec pins Node 20 and the suite crashed on load. | Pinned `@testcontainers/postgresql@11`. Check `engines` against Node 20 before installing. |
+| 3 | 01 | Wrote the line-23 expiry test expecting `2029-10-01T12:59:59.999Z`, assuming 1 Oct 2029 is in AEDT. Sydney DST starts on the first Sunday of October (7 Oct 2029), so that date is still AEST. | Checked with `Intl.DateTimeFormat` for Australia/Sydney before implementing; the expected value is now `2029-10-01T13:59:59.999Z`. |

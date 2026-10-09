@@ -15,14 +15,22 @@ export interface CardView {
   issuing_store_id: string;
   balance_minor: number;
   currency: string;
+  expires_at: string;
 }
 
 /** Creates the card and its opening issue entry. Runs inside the caller's transaction. */
 export async function issueCard(client: PoolClient, input: IssueInput): Promise<CardView> {
   const cardNumber = normaliseCardNumber(input.card_number);
   const { rows: [card] } = await client.query(
-    `INSERT INTO cards (card_number, pin_hash, issuing_store_id) VALUES ($1, $2, $3) RETURNING card_id`,
-    [cardNumber, hashPin(input.pin), input.store_id],
+    // Expiry: end of the local date 36 months after the local sale date, on the issuing store's clock (ADR 0002).
+    // Postgres month arithmetic clamps 29 Feb to 28 Feb.
+    `INSERT INTO cards (card_number, pin_hash, issuing_store_id, expires_at)
+     SELECT $1, $2, s.store_id,
+            ((date_trunc('day', $4::timestamptz AT TIME ZONE s.timezone) + interval '36 months' + interval '1 day')
+              AT TIME ZONE s.timezone) - interval '1 millisecond'
+     FROM stores s WHERE s.store_id = $3
+     RETURNING card_id`,
+    [cardNumber, hashPin(input.pin), input.store_id, input.occurred_at],
   );
   await client.query(
     `INSERT INTO ledger_entries (card_id, kind, amount_minor, occurred_at, store_id)
@@ -52,7 +60,8 @@ async function recomputeBalance(client: PoolClient, cardId: string): Promise<voi
 
 async function readCard(db: Pool | PoolClient, cardNumber: string): Promise<CardView> {
   const { rows: [row] } = await db.query(
-    `SELECT c.card_number, c.issuing_store_id, c.balance_minor::int AS balance_minor, s.currency
+    `SELECT c.card_number, c.issuing_store_id, c.balance_minor::int AS balance_minor, s.currency,
+            to_char(c.expires_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS expires_at
      FROM cards c JOIN stores s ON s.store_id = c.issuing_store_id
      WHERE c.card_number = $1`,
     [cardNumber],
