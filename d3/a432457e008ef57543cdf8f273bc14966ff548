@@ -1,0 +1,48 @@
+.claude/skills/code-review-and-quality/SKILL.md
+  s_ab92bfb3d6bd83::t_863836e4894b8f 1-398
+.claude/skills/codebase-design/DEEPENING.md
+  s_ab92bfb3d6bd83::t_a04e6b2b6573f9 1-37
+.claude/skills/codebase-design/DESIGN-IT-TWICE.md
+  s_ab92bfb3d6bd83::t_ce5ecc1fc401b8 1-44
+.claude/skills/codebase-design/SKILL.md
+  s_ab92bfb3d6bd83::t_5678e9134129e6 1-114
+.claude/skills/codebase-design/agents/openai.yaml
+  s_ab92bfb3d6bd83::t_30c8174dcbab1b 1-3
+.claude/skills/incremental-implementation/SKILL.md
+  s_ab92bfb3d6bd83::t_874d9d9c6e8a3c 1-250
+.claude/skills/tdd/SKILL.md
+  s_ab92bfb3d6bd83::t_2847657b7983ff 1-38
+.claude/skills/tdd/agents/openai.yaml
+  s_ab92bfb3d6bd83::t_30004c1bdc2882 1-3
+.claude/skills/tdd/mocking.md
+  s_ab92bfb3d6bd83::t_4995adf3ff7304 1-59
+.claude/skills/tdd/tests.md
+  s_ab92bfb3d6bd83::t_3aa6c63178eb65 1-77
+.claude/skills/to-tickets/SKILL.md
+  s_ab92bfb3d6bd83::t_496b4e68f1e45b 1-105
+.claude/skills/to-tickets/agents/openai.yaml
+  s_ab92bfb3d6bd83::t_0204efad633459 1-5
+CLAUDE.md
+  s_ab92bfb3d6bd83::t_a7098337bad211 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d3a432457e008ef57543cdf8f273bc14966ff548",
+  "prompts": {},
+  "humans": {
+    "h_a22f48b4ae3ec3": {
+      "author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  },
+  "sessions": {
+    "s_ab92bfb3d6bd83": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "72e545d3-0734-4455-8355-99d4a50aa694",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
