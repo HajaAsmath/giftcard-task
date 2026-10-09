@@ -45,3 +45,20 @@ test('responses never echo the PIN', async () => {
   const res = await send(h.baseUrl, fixtureLine(4));
   expect(res.text).not.toContain('9038');
 });
+
+test('concurrent matching issue requests create one gift card and all get the same response', async () => {
+  const line6 = fixtureLine(6);
+  const results = await Promise.all(Array.from({ length: 8 }, () => send(h.baseUrl, line6)));
+  expect(results[0].status).toBe(201);
+  for (const r of results) expect(r).toEqual(results[0]);
+  expect((await get(h.baseUrl, '/cards/6036280000001003/balance')).json.balance_minor).toBe(3000);
+});
+
+test('concurrent issues of the same card under different keys create it once', async () => {
+  const line7 = fixtureLine(7);
+  const results = await Promise.all(
+    ['k-race-a', 'k-race-b', 'k-race-c'].map((k) => send(h.baseUrl, { ...line7, headers: { 'Idempotency-Key': k } })),
+  );
+  expect(results.map((r) => r.status).sort()).toEqual([201, 409, 409]);
+  expect((await get(h.baseUrl, '/cards/6036280000001004/balance')).json.balance_minor).toBe(2000);
+});
