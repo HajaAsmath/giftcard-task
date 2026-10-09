@@ -1,0 +1,21 @@
+src/ledger.ts
+  s_f9664ac6bf3134::t_3ef7625ff835e4 103-104,106-107,112-116,120-121
+tests/redeem.test.ts
+  s_f9664ac6bf3134::t_98055a8c23c5ef 96-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7a903cd0f9909ba789baa09a44b5e4bba3ba7bbb",
+  "prompts": {},
+  "sessions": {
+    "s_f9664ac6bf3134": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b0139e10-0b8d-46d3-8517-6dbb13edc1e7",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
