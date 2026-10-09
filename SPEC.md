@@ -51,7 +51,7 @@ docs/adr/        → decisions
 
 **Ledger.** One append-only table: `card_id`, `kind` (issue, reload, redeem, reverse, offline_redeem), signed `amount_minor`, `occurred_at` (required), `recorded_at` (audit only), `store_id`, `redemption_ref` (unique), `reverses_entry_id`. Nothing is updated. `card.balance_minor` is a cache, recomputed from `SUM(amount_minor)` inside the transaction that holds `SELECT … FOR UPDATE` on the card row.
 
-**Online** writes can be refused: 400 malformed or missing `occurred_at` or key; 403 `invalid_pin`; 404 unknown card; 409 `idempotency_conflict` or `already_reversed`; 422 `insufficient_funds` or `card_expired`. **Offline** batches are applied whole, atomically, in `occurred_at` order, with balances allowed to go negative. Unique `redemption_ref` stops a batch re-uploaded under a new key.
+**Online** writes can be refused: 400 malformed or missing `occurred_at` or key; 403 `invalid_pin`; 404 unknown card; 409 `card_exists` (a second Issue of a Card Number already issued, under a new key), `duplicate_redemption_ref` (a redemption_ref already recorded, under a new key), `idempotency_conflict` or `already_reversed`; 422 `insufficient_funds` or `card_expired`. **Offline** batches are applied whole, atomically, in `occurred_at` order, with balances allowed to go negative. Unique `redemption_ref` stops a batch re-uploaded under a new key.
 
 **Time.** Expiry is the end of the local date 36 months after the local sale date, on the issuing store's clock, stored as `expires_at`. Month buckets use the local calendar of the store that performed the movement. The store timezone is a column seeded from `stores.json`.
 

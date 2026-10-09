@@ -1,6 +1,6 @@
 import { PoolClient, Pool } from 'pg';
-import { BadRequest, Conflict, NotFound } from './errors';
-import { hashPin } from './pin';
+import { BadRequest, Conflict, HttpError, NotFound, Refused, RefusedMovement } from './errors';
+import { hashPin, verifyPin } from './pin';
 
 export interface IssueInput {
   card_number: string;
@@ -73,4 +73,98 @@ async function readCard(db: Pool | PoolClient, cardNumber: string): Promise<Card
   );
   if (!row) throw new NotFound('card_not_found', `No gift card ${cardNumber}`);
   return row;
+}
+
+export interface RedeemInput {
+  card_number: string;
+  pin: string;
+  store_id: string;
+  amount_minor: number;
+  redemption_ref: string;
+  occurred_at: string;
+}
+
+export interface RedemptionView {
+  card_number: string;
+  redemption_ref: string;
+  store_id: string;
+  amount_minor: number;
+  balance_minor: number;
+  occurred_at: string;
+}
+
+/**
+ * Online redemption. The guest is present, so the ledger can still refuse it.
+ * Locks the card row, so two tills cannot spend the same balance.
+ */
+export async function redeemOnline(client: PoolClient, input: RedeemInput): Promise<RedemptionView> {
+  await requireStore(client, input.store_id);
+  const cardNumber = normaliseCardNumber(input.card_number);
+  const { rows: [card] } = await client.query(
+    `SELECT card_id, pin_hash, expires_at < $2::timestamptz AS expired
+     FROM cards WHERE card_number = $1 FOR UPDATE`,
+    [cardNumber, input.occurred_at],
+  );
+  if (!card) throw new NotFound('card_not_found', `No gift card ${cardNumber}`);
+  if (!(await verifyPin(input.pin, card.pin_hash))) throw new HttpError(403, 'invalid_pin', 'Wrong PIN');
+
+  const movement: RefusedMovement = {
+    card_id: card.card_id, store_id: input.store_id, amount_minor: input.amount_minor, occurred_at: input.occurred_at,
+  };
+  if (card.expired) throw new Refused(422, 'card_expired', `Gift card ${cardNumber} had expired`, movement);
+  const balance = await sumBalance(client, card.card_id);
+  if (balance < input.amount_minor) {
+    throw new Refused(422, 'insufficient_funds', `Balance ${balance} is less than ${input.amount_minor}`, movement);
+  }
+
+  await client.query(
+    `INSERT INTO ledger_entries (card_id, kind, amount_minor, occurred_at, store_id, redemption_ref)
+     VALUES ($1, 'redeem', $2, $3, $4, $5)`,
+    [card.card_id, -input.amount_minor, input.occurred_at, input.store_id, input.redemption_ref],
+  ).catch((err) => {
+    if (err.code === '23505') throw new Conflict('duplicate_redemption_ref', `redemption_ref ${input.redemption_ref} was already used`);
+    throw err;
+  });
+  await recomputeBalance(client, card.card_id);
+  return {
+    card_number: cardNumber, redemption_ref: input.redemption_ref, store_id: input.store_id,
+    amount_minor: input.amount_minor, balance_minor: balance - input.amount_minor, occurred_at: input.occurred_at,
+  };
+}
+
+/** Records a declined movement once per (Idempotency Key, request fingerprint). */
+export async function recordRefusedMovement(
+  client: PoolClient, movement: RefusedMovement, code: string, key: string, fingerprint: string,
+): Promise<void> {
+  await client.query(
+    `INSERT INTO refused_movements (card_id, store_id, amount_minor, code, occurred_at, idempotency_key, request_fingerprint)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
+     ON CONFLICT (idempotency_key, request_fingerprint) DO NOTHING`,
+    [movement.card_id, movement.store_id, movement.amount_minor, code, movement.occurred_at, key, fingerprint],
+  );
+}
+
+/** Audit of a conflicting key reuse; nothing is recorded if the card or store is unknown. */
+export async function recordConflictingRedemption(
+  client: PoolClient, input: RedeemInput, key: string, fingerprint: string,
+): Promise<void> {
+  const { rows: [card] } = await client.query(`SELECT card_id FROM cards WHERE card_number = $1`, [normaliseCardNumber(input.card_number)]);
+  const { rows: [store] } = await client.query(`SELECT 1 AS ok FROM stores WHERE store_id = $1`, [input.store_id]);
+  if (!card || !store) return;
+  await recordRefusedMovement(
+    client,
+    { card_id: card.card_id, store_id: input.store_id, amount_minor: input.amount_minor, occurred_at: input.occurred_at },
+    'idempotency_conflict', key, fingerprint,
+  );
+}
+
+async function requireStore(client: PoolClient, storeId: string): Promise<void> {
+  const { rowCount } = await client.query(`SELECT 1 FROM stores WHERE store_id = $1`, [storeId]);
+  if (!rowCount) throw new BadRequest('unknown_store', `No store ${storeId}`);
+}
+
+async function sumBalance(client: PoolClient, cardId: string): Promise<number> {
+  const { rows: [row] } = await client.query(
+    `SELECT COALESCE(SUM(amount_minor), 0)::int AS balance FROM ledger_entries WHERE card_id = $1`, [cardId]);
+  return row.balance;
 }

@@ -101,5 +101,5 @@ When the ledger first heard about a movement. Audit only; never drives Expiry or
 _Avoid_: Received at, created at, ingested at
 
 **Refused Movement**:
-A movement the ledger declined because the guest was present and the card could not pay. Recorded so finance can see what the tills attempted.
+A movement the ledger declined because the guest was present and the card could not pay, or because its Idempotency Key was reused for a different request (the spec lists fixture line 15 as refused). Recorded so finance can see what the tills attempted.
 _Avoid_: Failed transaction, error, rejection

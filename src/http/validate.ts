@@ -58,3 +58,11 @@ export function storeId(b: Body): string {
   if (typeof v !== 'string' || !v) throw new BadRequest('invalid_store_id', 'store_id is required');
   return v;
 }
+
+export function redemptionRef(b: Body): string {
+  const v = b.redemption_ref;
+  if (typeof v !== 'string' || !v.trim() || v.length > 128) {
+    throw new BadRequest('invalid_redemption_ref', 'redemption_ref must be a non-empty string');
+  }
+  return v;
+}

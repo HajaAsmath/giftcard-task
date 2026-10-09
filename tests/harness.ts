@@ -7,6 +7,7 @@ import { createApp } from '../src/http/app';
 
 export interface Harness {
   baseUrl: string;
+  pool: Pool;
   stop(): Promise<void>;
 }
 
@@ -20,6 +21,7 @@ export async function startHarness(): Promise<Harness> {
   const { port } = server.address() as AddressInfo;
   return {
     baseUrl: `http://127.0.0.1:${port}`,
+    pool,
     async stop() {
       await new Promise((resolve) => server.close(resolve));
       await pool.end();
@@ -66,5 +68,21 @@ export function freshIssue(overrides: Record<string, unknown> = {}): FixtureRequ
     ...base,
     headers: { 'Idempotency-Key': `k-fresh-${tag}` },
     body: { ...(base.body as object), card_number: `6036 2800 0001 ${tag}`, ...overrides },
+  };
+}
+
+/** An online redemption for a card from `freshIssue`, with a key and redemption_ref no other test uses. */
+export function freshRedeem(issue: FixtureRequest, amountMinor: number, overrides: Record<string, unknown> = {}): FixtureRequest {
+  seq += 1;
+  const tag = String(seq).padStart(4, '0');
+  const b = issue.body as Record<string, unknown>;
+  return {
+    method: 'POST',
+    path: '/redemptions',
+    headers: { 'Idempotency-Key': `k-fresh-r-${tag}` },
+    body: {
+      card_number: b.card_number, pin: b.pin, store_id: b.store_id, amount_minor: amountMinor,
+      redemption_ref: `rd-fresh-${tag}`, occurred_at: '2026-09-02T00:00:00Z', ...overrides,
+    },
   };
 }
