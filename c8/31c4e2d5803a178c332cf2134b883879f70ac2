@@ -1,0 +1,51 @@
+tsconfig.json
+  s_0a7badbc172fb2::t_37c7c52dcde64c 1-14
+AI-NOTES.md
+  s_0a7badbc172fb2::t_9010121ac5b8ab 1-7
+  s_0a7badbc172fb2::t_d02b731372b7d0 8
+package.json
+  s_0a7badbc172fb2::t_9010121ac5b8ab 27
+  s_0a7badbc172fb2::t_673b2d0d561db7 1-18,20-26,28-29
+  s_0a7badbc172fb2::t_d02b731372b7d0 19
+docker-compose.yml
+  s_0a7badbc172fb2::t_37c7c52dcde64c 1-9
+tests/harness.ts
+  s_0a7badbc172fb2::t_37c7c52dcde64c 1-56
+migrations/001_stores_cards_ledger.sql
+  s_0a7badbc172fb2::t_fdddc5a2882c95 1-37
+tests/issue-and-balance.test.ts
+  s_0a7badbc172fb2::t_37c7c52dcde64c 1-14
+src/errors.ts
+  s_0a7badbc172fb2::t_fdddc5a2882c95 1-22
+src/migrate.ts
+  s_0a7badbc172fb2::t_fdddc5a2882c95 1-49
+src/ledger.ts
+  s_0a7badbc172fb2::t_586a211c47e8f0 22,25,33,38-42
+  s_0a7badbc172fb2::t_fdddc5a2882c95 1-21,23-24,26-32,34-37,43-62
+src/http/app.ts
+  s_0a7badbc172fb2::t_fdddc5a2882c95 1-39
+src/pin.ts
+  s_0a7badbc172fb2::t_fdddc5a2882c95 1-13
+jest.config.js
+  s_0a7badbc172fb2::t_37c7c52dcde64c 1-7
+package-lock.json
+  s_0a7badbc172fb2::t_8aa7b89e509882 1-7688
+src/server.ts
+  s_0a7badbc172fb2::t_c21ea7c1df7312 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c831c4e2d5803a178c332cf2134b883879f70ac2",
+  "prompts": {},
+  "sessions": {
+    "s_0a7badbc172fb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf13d64a-5237-4723-acef-56b93b4d9fb0",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
