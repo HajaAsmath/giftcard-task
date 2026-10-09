@@ -1,0 +1,26 @@
+migrations/007_readonly_role.sql
+  s_f9664ac6bf3134::t_668b0845e58179 3-4
+AGENTS.md
+  s_f9664ac6bf3134::t_22b39194982fe5 1-85
+AI-NOTES.md
+  s_f9664ac6bf3134::t_668b0845e58179 16-17
+README.md
+  s_f9664ac6bf3134::t_d28dde81cfcea0 1-27,31-102
+  s_f9664ac6bf3134::t_668b0845e58179 28-30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "46bf4ee172bd9ef4c6a0d09db53fc7961e6610af",
+  "prompts": {},
+  "sessions": {
+    "s_f9664ac6bf3134": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b0139e10-0b8d-46d3-8517-6dbb13edc1e7",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
