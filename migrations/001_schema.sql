@@ -17,6 +17,7 @@ CREATE TABLE cards (
   card_number      text NOT NULL UNIQUE,   -- digits only, spaces stripped
   pin_hash         text NOT NULL,          -- scrypt$<salt hex>$<hash hex>
   issuing_store_id text NOT NULL REFERENCES stores(store_id),
+  issued_at        timestamptz NOT NULL,   -- same value as the issue entry's occurred_at; never updated
   expires_at       timestamptz NOT NULL,
   balance_minor    bigint NOT NULL DEFAULT 0  -- cache of SUM(ledger_entries.amount_minor)
 );

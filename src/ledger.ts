@@ -25,8 +25,8 @@ export async function issueCard(client: PoolClient, input: IssueInput): Promise<
   const { rows: [card] } = await client.query(
     // Expiry: end of the local date 36 months after the local sale date, on the issuing store's clock (ADR 0002).
     // Postgres month arithmetic clamps 29 Feb to 28 Feb.
-    `INSERT INTO cards (card_number, pin_hash, issuing_store_id, expires_at)
-     SELECT $1, $2, s.store_id,
+    `INSERT INTO cards (card_number, pin_hash, issuing_store_id, issued_at, expires_at)
+     SELECT $1, $2, s.store_id, $4::timestamptz,
             ((date_trunc('day', $4::timestamptz AT TIME ZONE s.timezone) + interval '36 months' + interval '1 day')
               AT TIME ZONE s.timezone) - interval '1 millisecond'
      FROM stores s WHERE s.store_id = $3
@@ -101,7 +101,7 @@ export async function redeemOnline(client: PoolClient, input: RedeemInput): Prom
   await requireStore(client, input.store_id);
   const cardNumber = normaliseCardNumber(input.card_number);
   const { rows: [card] } = await client.query(
-    `SELECT card_id, pin_hash, expires_at < $2::timestamptz AS expired
+    `SELECT card_id, pin_hash, expires_at < $2::timestamptz AS expired, issued_at > $2::timestamptz AS too_early
      FROM cards WHERE card_number = $1 FOR UPDATE`,
     [cardNumber, input.occurred_at],
   );
@@ -112,6 +112,9 @@ export async function redeemOnline(client: PoolClient, input: RedeemInput): Prom
     card_id: card.card_id, store_id: input.store_id, amount_minor: input.amount_minor, occurred_at: input.occurred_at,
   };
   if (card.expired) throw new Refused(422, 'card_expired', `Gift card ${cardNumber} had expired`, movement);
+  if (card.too_early) {
+    throw new Refused(422, 'occurred_before_issue', `Gift card ${cardNumber} was issued after ${input.occurred_at}`, movement);
+  }
   const balance = await sumBalance(client, card.card_id);
   if (balance < input.amount_minor) {
     throw new Refused(422, 'insufficient_funds', `Balance ${balance} is less than ${input.amount_minor}`, movement);
@@ -188,8 +191,14 @@ export interface ReloadView {
 export async function reloadCard(client: PoolClient, input: ReloadInput): Promise<ReloadView> {
   await requireStore(client, input.store_id);
   const cardNumber = normaliseCardNumber(input.card_number);
-  const { rows: [card] } = await client.query(`SELECT card_id FROM cards WHERE card_number = $1 FOR UPDATE`, [cardNumber]);
+  const { rows: [card] } = await client.query(
+    `SELECT card_id, issued_at > $2::timestamptz AS too_early FROM cards WHERE card_number = $1 FOR UPDATE`,
+    [cardNumber, input.occurred_at],
+  );
   if (!card) throw new NotFound('card_not_found', `No gift card ${cardNumber}`);
+  if (card.too_early) {
+    throw new HttpError(422, 'occurred_before_issue', `Gift card ${cardNumber} was issued after ${input.occurred_at}`);
+  }
   await client.query(
     `INSERT INTO ledger_entries (card_id, kind, amount_minor, occurred_at, store_id) VALUES ($1, 'reload', $2, $3, $4)`,
     [card.card_id, input.amount_minor, input.occurred_at, input.store_id],
@@ -221,7 +230,8 @@ export interface ReversalView {
  */
 export async function reverseRedemption(client: PoolClient, input: ReverseInput): Promise<ReversalView> {
   const { rows: [original] } = await client.query(
-    `SELECT e.entry_id, e.card_id, e.store_id, (-e.amount_minor)::int AS amount_minor, c.card_number
+    `SELECT e.entry_id, e.card_id, e.store_id, (-e.amount_minor)::int AS amount_minor, c.card_number,
+            e.occurred_at AS redemption_at
      FROM ledger_entries e JOIN cards c ON c.card_id = e.card_id
      WHERE e.redemption_ref = $1 AND e.kind IN ('redeem', 'offline_redeem')`,
     [input.redemption_ref],
@@ -229,6 +239,9 @@ export async function reverseRedemption(client: PoolClient, input: ReverseInput)
   if (!original) throw new NotFound('redemption_not_found', `No redemption ${input.redemption_ref}`);
 
   await client.query(`SELECT 1 FROM cards WHERE card_id = $1 FOR UPDATE`, [original.card_id]);
+  if (Date.parse(input.occurred_at) < original.redemption_at.getTime()) {
+    throw new HttpError(422, 'reversal_before_redemption', `Redemption ${input.redemption_ref} happened after ${input.occurred_at}`);
+  }
   const { rowCount: alreadyReversed } = await client.query(`SELECT 1 FROM ledger_entries WHERE reverses_entry_id = $1`, [original.entry_id]);
   if (alreadyReversed) throw new Conflict('already_reversed', `Redemption ${input.redemption_ref} was already reversed`);
 
@@ -272,10 +285,19 @@ export async function recordOfflineBatch(client: PoolClient, input: OfflineBatch
 
   // Lock every card in one global order (card number), so concurrent batches cannot deadlock.
   const cardIds = new Map<string, string>();
+  const issuedAt = new Map<string, number>();
   for (const number of [...new Set(items.map((i) => i.card_number))].sort()) {
-    const { rows: [card] } = await client.query(`SELECT card_id FROM cards WHERE card_number = $1 FOR UPDATE`, [number]);
+    const { rows: [card] } = await client.query(
+      `SELECT card_id, issued_at FROM cards WHERE card_number = $1 FOR UPDATE`, [number],
+    );
     if (!card) throw new NotFound('card_not_found', `No gift card ${number}`);
     cardIds.set(number, card.card_id);
+    issuedAt.set(number, card.issued_at.getTime());
+  }
+  for (const item of items) {
+    if (item.at < (issuedAt.get(item.card_number) as number)) {
+      throw new HttpError(422, 'occurred_before_issue', `Gift card ${item.card_number} was issued after ${item.occurred_at}`);
+    }
   }
 
   for (const item of items) {

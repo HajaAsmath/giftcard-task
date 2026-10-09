@@ -25,6 +25,8 @@ No ORM, no query builder, no hidden transactions. Ask before adding a dependency
   by hand because `parseFloat('8.29') * 100` is 828.9999999999999.
 - `occurred_at` is the business clock and is required on every write. Never substitute `now()` for it. It drives
   expiry, month buckets and the report. `recorded_at` is audit only.
+- No movement is dated before the card was issued, and no reversal before its redemption. Both are refused with 422
+  (`occurred_before_issue`, `reversal_before_redemption`), so a bad date cannot rewrite an earlier month's report.
 - Ledger entries are append-only. A database trigger refuses UPDATE and DELETE. Correct a mistake with a reverse
   entry, not by editing history.
 - Liability belongs to the issuing store (ADR 0001). Overdrawn balances are never netted into liability (ADR 0003).

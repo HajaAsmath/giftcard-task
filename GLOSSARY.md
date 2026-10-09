@@ -93,7 +93,7 @@ A second request reusing an Idempotency Key with a different request. Refused; t
 _Avoid_: Duplicate, key reuse error
 
 **Occurred At**:
-When a movement happened in the world, as reported by the caller. Drives Expiry and the monthly report.
+When a movement happened in the world, as reported by the caller. Drives Expiry and the monthly report. A movement is never dated before the card was issued, nor a reversal before its redemption.
 _Avoid_: Timestamp, event time, created at
 
 **Recorded At**:
