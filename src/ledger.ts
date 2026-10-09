@@ -21,6 +21,7 @@ export interface CardView {
 /** Creates the card and its opening issue entry. Runs inside the caller's transaction. */
 export async function issueCard(client: PoolClient, input: IssueInput): Promise<CardView> {
   const cardNumber = normaliseCardNumber(input.card_number);
+  const pinHash = await hashPin(input.pin);
   const { rows: [card] } = await client.query(
     // Expiry: end of the local date 36 months after the local sale date, on the issuing store's clock (ADR 0002).
     // Postgres month arithmetic clamps 29 Feb to 28 Feb.
@@ -30,7 +31,7 @@ export async function issueCard(client: PoolClient, input: IssueInput): Promise<
               AT TIME ZONE s.timezone) - interval '1 millisecond'
      FROM stores s WHERE s.store_id = $3
      RETURNING card_id`,
-    [cardNumber, hashPin(input.pin), input.store_id, input.occurred_at],
+    [cardNumber, pinHash, input.store_id, input.occurred_at],
   ).catch((err) => {
     if (err.code === '23505') throw new Conflict('card_exists', `Gift card ${cardNumber} was already issued`);
     throw err;

@@ -1,6 +1,7 @@
-import { createHash, scryptSync } from 'node:crypto';
+import { createHash } from 'node:crypto';
 import { Pool, PoolClient } from 'pg';
 import { Conflict, errorBody, HttpError } from './errors';
+import { keyedPinHash } from './pin';
 
 export interface WriteRequest {
   key: string;
@@ -31,7 +32,7 @@ export async function idempotent(
   req: WriteRequest,
   write: (client: PoolClient) => Promise<WriteResult>,
 ): Promise<StoredResponse> {
-  const fp = fingerprint(req);
+  const fp = await fingerprint(req);
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -81,9 +82,9 @@ async function replay(client: PoolClient, key: string, fp: string): Promise<Stor
 }
 
 /** sha256 over method, path and canonical body. The PIN enters only as a hash salted by the key. */
-function fingerprint(req: WriteRequest): string {
+async function fingerprint(req: WriteRequest): Promise<string> {
   const body = { ...req.body };
-  if (typeof body.pin === 'string') body.pin = scryptSync(body.pin, `idempotency:${req.key}`, 32).toString('hex');
+  if (typeof body.pin === 'string') body.pin = await keyedPinHash(body.pin, `idempotency:${req.key}`);
   return createHash('sha256').update(`${req.method}\n${req.path}\n${canonicalJson(body)}`).digest('hex');
 }
 
