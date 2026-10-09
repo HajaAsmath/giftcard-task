@@ -1,5 +1,5 @@
 import { PoolClient, Pool } from 'pg';
-import { NotFound } from './errors';
+import { BadRequest, NotFound } from './errors';
 import { hashPin } from './pin';
 
 export interface IssueInput {
@@ -32,6 +32,7 @@ export async function issueCard(client: PoolClient, input: IssueInput): Promise<
      RETURNING card_id`,
     [cardNumber, hashPin(input.pin), input.store_id, input.occurred_at],
   );
+  if (!card) throw new BadRequest('unknown_store', `No store ${input.store_id}`);
   await client.query(
     `INSERT INTO ledger_entries (card_id, kind, amount_minor, occurred_at, store_id)
      VALUES ($1, 'issue', $2, $3, $4)`,
