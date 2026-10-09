@@ -1,0 +1,43 @@
+src/http/app.ts
+  s_0a7badbc172fb2::t_a7fe82e76e2023 16
+  s_0a7badbc172fb2::t_57a8cef0552d9a 2,4-5,12-15,17-21,42-61
+  s_0a7badbc172fb2::t_688cea55ec51ef 62
+tests/redeem.test.ts
+  s_0a7badbc172fb2::t_455ad7204a4373 89-97
+  s_0a7badbc172fb2::t_b823408d31edbb 1-88,98-147
+migrations/004_refused_movements.sql
+  s_0a7badbc172fb2::t_a7fe82e76e2023 1-14
+GLOSSARY.md
+  s_0a7badbc172fb2::t_7c824129ad772c 104
+src/http/validate.ts
+  s_0a7badbc172fb2::t_57a8cef0552d9a 61-68
+tests/harness.ts
+  s_0a7badbc172fb2::t_b823408d31edbb 10,24,73-86
+  s_0a7badbc172fb2::t_32b6ebf17e901a 87-88
+src/errors.ts
+  s_0a7badbc172fb2::t_57a8cef0552d9a 23-37
+src/idempotency.ts
+  s_0a7badbc172fb2::t_57a8cef0552d9a 3-4,35,48,58,76-78,84
+AI-NOTES.md
+  s_0a7badbc172fb2::t_7c824129ad772c 12-13
+src/ledger.ts
+  s_0a7badbc172fb2::t_57a8cef0552d9a 2-3,77-170
+SPEC.md
+  s_0a7badbc172fb2::t_7c824129ad772c 54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c04a298707a13ca4c87df4d88cafd610b56e04f8",
+  "prompts": {},
+  "sessions": {
+    "s_0a7badbc172fb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf13d64a-5237-4723-acef-56b93b4d9fb0",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
