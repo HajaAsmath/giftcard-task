@@ -1,0 +1,36 @@
+src/money.ts
+  s_0a7badbc172fb2::t_b69830c97c7ccb 1-10
+src/ledger.ts
+  s_0a7badbc172fb2::t_b69830c97c7ccb 249-298
+tests/harness.ts
+  s_0a7badbc172fb2::t_4975fb376964c5 114-143
+src/http/validate.ts
+  s_0a7badbc172fb2::t_b69830c97c7ccb 3,78-115
+tests/offline-batch.test.ts
+  s_0a7badbc172fb2::t_4975fb376964c5 1-172
+tests/money.test.ts
+  s_0a7badbc172fb2::t_4975fb376964c5 1-21
+migrations/006_ledger_terminal.sql
+  s_0a7badbc172fb2::t_b69830c97c7ccb 1-2
+src/http/app.ts
+  s_0a7badbc172fb2::t_b69830c97c7ccb 4,32-33
+  s_0a7badbc172fb2::t_c2fa892ae16ad0 34
+SPEC.md
+  s_0a7badbc172fb2::t_216ca0879da3f2 52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "116c46e8c9243045c09b8ada4d03af94de8b676f",
+  "prompts": {},
+  "sessions": {
+    "s_0a7badbc172fb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf13d64a-5237-4723-acef-56b93b4d9fb0",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
