@@ -100,19 +100,25 @@ export interface RedemptionView {
 export async function redeemOnline(client: PoolClient, input: RedeemInput): Promise<RedemptionView> {
   await requireStore(client, input.store_id);
   const cardNumber = normaliseCardNumber(input.card_number);
+  // The PIN is checked on an unlocked read: the hash never changes after issue, so this
+  // is safe, and a slow scrypt does not queue every other till behind this card's lock.
   const { rows: [card] } = await client.query(
-    `SELECT card_id, pin_hash, expires_at < $2::timestamptz AS expired, issued_at > $2::timestamptz AS too_early
-     FROM cards WHERE card_number = $1 FOR UPDATE`,
-    [cardNumber, input.occurred_at],
+    `SELECT card_id, pin_hash FROM cards WHERE card_number = $1`,
+    [cardNumber],
   );
   if (!card) throw new NotFound('card_not_found', `No gift card ${cardNumber}`);
   if (!(await verifyPin(input.pin, card.pin_hash))) throw new HttpError(403, 'invalid_pin', 'Wrong PIN');
 
+  const { rows: [state] } = await client.query(
+    `SELECT expires_at < $2::timestamptz AS expired, issued_at > $2::timestamptz AS too_early
+     FROM cards WHERE card_id = $1 FOR UPDATE`,
+    [card.card_id, input.occurred_at],
+  );
   const movement: RefusedMovement = {
     card_id: card.card_id, store_id: input.store_id, amount_minor: input.amount_minor, occurred_at: input.occurred_at,
   };
-  if (card.expired) throw new Refused(422, 'card_expired', `Gift card ${cardNumber} had expired`, movement);
-  if (card.too_early) {
+  if (state.expired) throw new Refused(422, 'card_expired', `Gift card ${cardNumber} had expired`, movement);
+  if (state.too_early) {
     throw new Refused(422, 'occurred_before_issue', `Gift card ${cardNumber} was issued after ${input.occurred_at}`, movement);
   }
   const balance = await sumBalance(client, card.card_id);

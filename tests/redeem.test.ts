@@ -93,6 +93,20 @@ test('the expiry instant itself is still spendable, and one millisecond later is
   expect(codeOf(after)).toBe('card_expired');
 });
 
+test('twenty wrong-PIN attempts on one card do not queue behind the hash', async () => {
+  const card = await issued();
+  const started = performance.now();
+  const results = await Promise.all(
+    Array.from({ length: 20 }, () => send(h.baseUrl, freshRedeem(card, 100, { pin: '0000' }))),
+  );
+  const elapsed = performance.now() - started;
+  expect(results.every((r) => r.status === 403)).toBe(true);
+  // If the PIN hash ran while the card row was locked, the attempts would serialize:
+  // roughly 20 x 21ms of scrypt, about half a second. Verified parallel, they finish
+  // in well under 300ms.
+  expect(elapsed).toBeLessThan(300);
+});
+
 test('lines 11 and 12 sent together give exactly one 201 and one 422, and the balance is 1000', async () => {
   expect((await send(h.baseUrl, fixtureLine(6))).status).toBe(201);
   const results = await Promise.all([send(h.baseUrl, fixtureLine(11)), send(h.baseUrl, fixtureLine(12))]);
