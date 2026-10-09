@@ -1,0 +1,21 @@
+tests/issue-and-balance.test.ts
+  s_0a7badbc172fb2::t_205ffc2d3d0430 15-26
+src/ledger.ts
+  s_0a7badbc172fb2::t_0f401cb66fec5c 37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3f7794372627ddca82bbf8f757bd4536801387c8",
+  "prompts": {},
+  "sessions": {
+    "s_0a7badbc172fb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf13d64a-5237-4723-acef-56b93b4d9fb0",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
