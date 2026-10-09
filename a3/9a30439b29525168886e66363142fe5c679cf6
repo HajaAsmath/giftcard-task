@@ -1,0 +1,24 @@
+tests/report.test.ts
+  s_f9664ac6bf3134::t_591820b6b0e040 1,115-131
+  s_f9664ac6bf3134::t_e2d76dd9e66b8e 132
+tests/redeem.test.ts
+  s_f9664ac6bf3134::t_591820b6b0e040 82-95
+AI-NOTES.md
+  s_f9664ac6bf3134::t_d34238d1137555 19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a39a30439b29525168886e66363142fe5c679cf6",
+  "prompts": {},
+  "sessions": {
+    "s_f9664ac6bf3134": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b0139e10-0b8d-46d3-8517-6dbb13edc1e7",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
