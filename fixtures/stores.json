@@ -1,0 +1,17 @@
+{
+  "group": "Harbour Hospitality",
+  "timezone": "Australia/Sydney",
+  "currency": "AUD",
+  "stores": [
+    { "store_id": "s1", "name": "CBD", "legal_entity": "Harbour CBD Pty Ltd" },
+    { "store_id": "s2", "name": "Bondi", "legal_entity": "Harbour Bondi Pty Ltd" },
+    { "store_id": "s3", "name": "Parramatta", "legal_entity": "Harbour West Pty Ltd" }
+  ],
+  "gift_card_policy": {
+    "expiry_months_from_sale": 36,
+    "expires_at": "end of the expiry date, store local time",
+    "liability_owner": "issuing store",
+    "cross_store_redemption": "issuing store owes redeeming store the redeemed amount",
+    "offline_redemption": "terminal may redeem offline; batch uploaded later"
+  }
+}
