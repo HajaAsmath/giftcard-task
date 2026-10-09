@@ -1,0 +1,24 @@
+tests/replay.test.ts
+  s_0a7badbc172fb2::t_e30518cdf532ea 1-6,10-18,22-23,25-26,28-64
+  s_0a7badbc172fb2::t_f45b4689db2ab4 7-9,19-21,24,27
+src/replay.ts
+  s_0a7badbc172fb2::t_e30d1b008297b8 1-73
+package.json
+  s_0a7badbc172fb2::t_e30d1b008297b8 12-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f582cc5a6b0ffb32e4eb4dca35d6f3d70fc79278",
+  "prompts": {},
+  "sessions": {
+    "s_0a7badbc172fb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf13d64a-5237-4723-acef-56b93b4d9fb0",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
