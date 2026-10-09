@@ -1,0 +1,19 @@
+migrations/001_schema.sql
+  s_f9664ac6bf3134::t_dc75e0fccbef4b 1-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "52c6c316526f899069ad8582d5430e12db1714e1",
+  "prompts": {},
+  "sessions": {
+    "s_f9664ac6bf3134": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b0139e10-0b8d-46d3-8517-6dbb13edc1e7",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
