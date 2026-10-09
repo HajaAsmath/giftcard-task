@@ -1,0 +1,43 @@
+tests/report-replay.test.ts
+  s_0a7badbc172fb2::t_d156dd478978e7 1-13,17-43
+  s_0a7badbc172fb2::t_6d5f99a22819c6 14-16
+src/report.ts
+  s_0a7badbc172fb2::t_3c2261f188e3ed 61
+  s_f9664ac6bf3134::t_896c81d67ae14a 1-60,62-200
+package.json
+  s_f9664ac6bf3134::t_8bb7b2e0c64924 13-14
+tests/report-boundaries.test.ts
+  s_0a7badbc172fb2::t_d156dd478978e7 1-66
+tests/report.test.ts
+  s_0a7badbc172fb2::t_d156dd478978e7 1-138
+tests/harness.ts
+  s_0a7badbc172fb2::t_d156dd478978e7 144-153
+AI-NOTES.md
+  s_f9664ac6bf3134::t_09dcbc24a5f834 15
+src/http/app.ts
+  s_f9664ac6bf3134::t_51873354ff38ce 6,36-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8e2393263390b43a475e85e0ac50d7b586e5662c",
+  "prompts": {},
+  "sessions": {
+    "s_0a7badbc172fb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf13d64a-5237-4723-acef-56b93b4d9fb0",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    },
+    "s_f9664ac6bf3134": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b0139e10-0b8d-46d3-8517-6dbb13edc1e7",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
