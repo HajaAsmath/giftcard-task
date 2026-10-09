@@ -1,0 +1,31 @@
+tests/harness.ts
+  s_0a7badbc172fb2::t_5c94a997317c1e 102-113
+src/http/validate.ts
+  s_0a7badbc172fb2::t_0ac3437366aa8c 69-76
+migrations/005_one_reversal_per_redemption.sql
+  s_0a7badbc172fb2::t_0ac3437366aa8c 1-2
+tests/reverse.test.ts
+  s_0a7badbc172fb2::t_5c94a997317c1e 1-107,109-142
+  s_0a7badbc172fb2::t_0ac3437366aa8c 108
+src/http/app.ts
+  s_0a7badbc172fb2::t_0ac3437366aa8c 4,27-30
+  s_0a7badbc172fb2::t_c4477f556dd477 31
+src/ledger.ts
+  s_0a7badbc172fb2::t_0ac3437366aa8c 203-248
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c5af1153b9519d3d14b4973774a95c7f52816787",
+  "prompts": {},
+  "sessions": {
+    "s_0a7badbc172fb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf13d64a-5237-4723-acef-56b93b4d9fb0",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
