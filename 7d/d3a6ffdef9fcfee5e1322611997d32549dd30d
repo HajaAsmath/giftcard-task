@@ -1,0 +1,23 @@
+src/pin.ts
+  s_0a7badbc172fb2::t_2754ad9b2653f0 1-5,8,10,13,16-21
+src/ledger.ts
+  s_0a7badbc172fb2::t_2754ad9b2653f0 24,34
+src/idempotency.ts
+  s_0a7badbc172fb2::t_2754ad9b2653f0 1,4,35,85,87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7dd3a6ffdef9fcfee5e1322611997d32549dd30d",
+  "prompts": {},
+  "sessions": {
+    "s_0a7badbc172fb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf13d64a-5237-4723-acef-56b93b4d9fb0",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
