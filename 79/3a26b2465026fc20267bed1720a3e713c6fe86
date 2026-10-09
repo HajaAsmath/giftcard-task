@@ -1,0 +1,21 @@
+tests/issue-idempotency.test.ts
+  s_0a7badbc172fb2::t_1ff391ee837af2 48-64
+AI-NOTES.md
+  s_0a7badbc172fb2::t_2e97d269d6636b 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "793a26b2465026fc20267bed1720a3e713c6fe86",
+  "prompts": {},
+  "sessions": {
+    "s_0a7badbc172fb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf13d64a-5237-4723-acef-56b93b4d9fb0",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
