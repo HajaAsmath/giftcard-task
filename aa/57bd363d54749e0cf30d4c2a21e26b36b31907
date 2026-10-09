@@ -1,0 +1,38 @@
+src/mcp/server.ts
+  s_f9664ac6bf3134::t_971d8f78295dc7 1-38
+src/report.ts
+  s_f9664ac6bf3134::t_971d8f78295dc7 2,58-62,64-67,72,82,85,159,181-182,189,191-192,194-198,200
+package.json
+  s_f9664ac6bf3134::t_7d7cbb89dd789d 18
+  s_f9664ac6bf3134::t_291ff181474f83 14-15
+tests/mcp-stdio.test.ts
+  s_f9664ac6bf3134::t_291ff181474f83 1-55
+migrations/007_readonly_role.sql
+  s_f9664ac6bf3134::t_971d8f78295dc7 1-11
+tests/harness.ts
+  s_f9664ac6bf3134::t_291ff181474f83 11-12,27
+src/mcp/tool.ts
+  s_f9664ac6bf3134::t_971d8f78295dc7 1-31
+tests/mcp.test.ts
+  s_f9664ac6bf3134::t_291ff181474f83 1-97
+SPEC.md
+  s_f9664ac6bf3134::t_2aaa495a6de145 71
+package-lock.json
+  s_f9664ac6bf3134::t_bba3f949da41db 11,1061-1072,1632-1680,2751-2783,3722-3738,4215-4235,4331-4355,4370-4385,4714-4722,4833-4841,5608-5616,5658-5669,6075-6083,6398-6406,6715-6723,7920-7937
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "aa57bd363d54749e0cf30d4c2a21e26b36b31907",
+  "prompts": {},
+  "sessions": {
+    "s_f9664ac6bf3134": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b0139e10-0b8d-46d3-8517-6dbb13edc1e7",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
