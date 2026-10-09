@@ -1,4 +1,4 @@
-import { fixtureLine, get, Harness, send, startHarness } from './harness';
+import { fixtureLine, freshIssue, get, Harness, send, startHarness } from './harness';
 
 let h: Harness;
 beforeAll(async () => { h = await startHarness(); });
@@ -14,9 +14,14 @@ test('issuing a gift card makes its balance available', async () => {
 });
 
 test('a card number with spaces identifies the same gift card', async () => {
-  const balance = await get(h.baseUrl, '/cards/' + encodeURIComponent('6036 2800 0000 1001') + '/balance');
-  expect(balance.status).toBe(200);
-  expect(balance.json).toMatchObject({ card_number: '6036280000001001', balance_minor: 10000 });
+  const issue = freshIssue();
+  expect((await send(h.baseUrl, issue)).status).toBe(201);
+
+  const spaced = await get(h.baseUrl, '/cards/' + encodeURIComponent((issue.body as any).card_number) + '/balance');
+  const bare = await get(h.baseUrl, '/cards/' + (issue.body as any).card_number.replace(/ /g, '') + '/balance');
+  expect(spaced.status).toBe(200);
+  expect(spaced.json).toMatchObject({ balance_minor: 10000 });
+  expect(bare.json).toEqual(spaced.json);
 });
 
 test('checking the balance of an unknown gift card is a 404', async () => {

@@ -54,3 +54,17 @@ export async function get(baseUrl: string, path: string): Promise<{ status: numb
   const res = await fetch(baseUrl + path);
   return { status: res.status, json: await res.json() };
 }
+
+let seq = 0;
+
+/** An issue request for a card number and key no other test uses, so tests never share state. */
+export function freshIssue(overrides: Record<string, unknown> = {}): FixtureRequest {
+  seq += 1;
+  const base = fixtureLine(3);
+  const tag = String(seq).padStart(4, '0');
+  return {
+    ...base,
+    headers: { 'Idempotency-Key': `k-fresh-${tag}` },
+    body: { ...(base.body as object), card_number: `6036 2800 0001 ${tag}`, ...overrides },
+  };
+}
