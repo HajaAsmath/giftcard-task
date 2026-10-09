@@ -1,0 +1,29 @@
+GLOSSARY.md
+  s_507a69b8b4a35f::t_c0fcca7a2263de 1-105
+SPEC.md
+  s_507a69b8b4a35f::t_68548d48a7ab0a 1-128
+docs/adr/0001-liability-belongs-to-the-issuing-store.md
+  s_507a69b8b4a35f::t_66a332d26d6a09 1-7
+docs/adr/0002-expiry-and-month-boundaries-are-store-local.md
+  s_507a69b8b4a35f::t_6a01bac3ffd0bf 1-7
+docs/adr/0003-offline-redemptions-are-recorded-not-refused.md
+  s_507a69b8b4a35f::t_7948b01dced12f 1-5
+docs/adr/0004-idempotency-key-reuse-with-a-different-body-is-a-conflict.md
+  s_507a69b8b4a35f::t_53ba45aed68427 1-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9f6fa9c6d1e6ee612faecf34af01d077c1c23f32",
+  "prompts": {},
+  "sessions": {
+    "s_507a69b8b4a35f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7d17cf3f-23e4-419f-946b-eac31e821d75",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
