@@ -168,3 +168,35 @@ async function sumBalance(client: PoolClient, cardId: string): Promise<number> {
     `SELECT COALESCE(SUM(amount_minor), 0)::int AS balance FROM ledger_entries WHERE card_id = $1`, [cardId]);
   return row.balance;
 }
+
+export interface ReloadInput {
+  card_number: string;
+  store_id: string;
+  amount_minor: number;
+  occurred_at: string;
+}
+
+export interface ReloadView {
+  card_number: string;
+  store_id: string;
+  amount_minor: number;
+  balance_minor: number;
+  occurred_at: string;
+}
+
+/** Adds value to an existing card. The issuing store and the stored expiry do not change. */
+export async function reloadCard(client: PoolClient, input: ReloadInput): Promise<ReloadView> {
+  await requireStore(client, input.store_id);
+  const cardNumber = normaliseCardNumber(input.card_number);
+  const { rows: [card] } = await client.query(`SELECT card_id FROM cards WHERE card_number = $1 FOR UPDATE`, [cardNumber]);
+  if (!card) throw new NotFound('card_not_found', `No gift card ${cardNumber}`);
+  await client.query(
+    `INSERT INTO ledger_entries (card_id, kind, amount_minor, occurred_at, store_id) VALUES ($1, 'reload', $2, $3, $4)`,
+    [card.card_id, input.amount_minor, input.occurred_at, input.store_id],
+  );
+  await recomputeBalance(client, card.card_id);
+  return {
+    card_number: cardNumber, store_id: input.store_id, amount_minor: input.amount_minor,
+    balance_minor: await sumBalance(client, card.card_id), occurred_at: input.occurred_at,
+  };
+}

@@ -86,3 +86,16 @@ export function freshRedeem(issue: FixtureRequest, amountMinor: number, override
     },
   };
 }
+
+/** A reload for a card from `freshIssue`, with a key no other test uses. */
+export function freshReload(issue: FixtureRequest, amountMinor: number, overrides: Record<string, unknown> = {}): FixtureRequest {
+  seq += 1;
+  const tag = String(seq).padStart(4, '0');
+  const b = issue.body as Record<string, unknown>;
+  return {
+    method: 'POST',
+    path: '/cards/reload',
+    headers: { 'Idempotency-Key': `k-fresh-rl-${tag}` },
+    body: { card_number: b.card_number, store_id: b.store_id, amount_minor: amountMinor, occurred_at: '2026-09-03T00:00:00Z', ...overrides },
+  };
+}
