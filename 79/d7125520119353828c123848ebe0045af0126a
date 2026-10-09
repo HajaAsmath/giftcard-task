@@ -1,0 +1,28 @@
+src/idempotency.ts
+  s_0a7badbc172fb2::t_fd2b54f82fdc3a 1-97
+src/http/app.ts
+  s_0a7badbc172fb2::t_fd2b54f82fdc3a 5,13,19-23
+src/ledger.ts
+  s_0a7badbc172fb2::t_fd2b54f82fdc3a 2
+  s_0a7badbc172fb2::t_1678f029b952a9 34-37
+tests/issue-idempotency.test.ts
+  s_0a7badbc172fb2::t_6a28de6910f5da 1-47
+migrations/003_idempotency_keys.sql
+  s_0a7badbc172fb2::t_fd2b54f82fdc3a 1-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "79d7125520119353828c123848ebe0045af0126a",
+  "prompts": {},
+  "sessions": {
+    "s_0a7badbc172fb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf13d64a-5237-4723-acef-56b93b4d9fb0",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
