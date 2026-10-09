@@ -99,3 +99,15 @@ export function freshReload(issue: FixtureRequest, amountMinor: number, override
     body: { card_number: b.card_number, store_id: b.store_id, amount_minor: amountMinor, occurred_at: '2026-09-03T00:00:00Z', ...overrides },
   };
 }
+
+/** A reversal of the redemption in `redeem`, with a key no other test uses. */
+export function freshReverse(redeem: FixtureRequest, overrides: Record<string, unknown> = {}): FixtureRequest {
+  seq += 1;
+  const tag = String(seq).padStart(4, '0');
+  return {
+    method: 'POST',
+    path: '/reversals',
+    headers: { 'Idempotency-Key': `k-fresh-rv-${tag}` },
+    body: { redemption_ref: (redeem.body as any).redemption_ref, reason: 'order refunded', occurred_at: '2026-09-04T00:00:00Z', ...overrides },
+  };
+}

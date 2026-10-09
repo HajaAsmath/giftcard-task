@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { Pool, PoolClient } from 'pg';
 import { errorBody, HttpError } from '../errors';
-import { getCard, issueCard, recordConflictingRedemption, redeemOnline, reloadCard } from '../ledger';
+import { getCard, issueCard, recordConflictingRedemption, redeemOnline, reloadCard, reverseRedemption } from '../ledger';
 import { idempotent, WriteResult } from '../idempotency';
 import * as v from './validate';
 
@@ -23,6 +23,11 @@ export function createApp(pool: Pool) {
   app.post('/cards/reload', writeRoute(pool, (b) => ({
     card_number: v.cardNumber(b), store_id: v.storeId(b), amount_minor: v.amountMinor(b), occurred_at: v.occurredAt(b),
   }), async (client, input) => ({ status: 201, body: await reloadCard(client, input) })));
+
+  app.post('/reversals', writeRoute(pool, (b) => {
+    v.reason(b);
+    return { redemption_ref: v.redemptionRef(b), occurred_at: v.occurredAt(b) };
+  }, async (client, input) => ({ status: 201, body: await reverseRedemption(client, input) })));
 
   app.get('/cards/:card_number/balance', async (req, res) => {
     res.json(await getCard(pool, req.params.card_number));

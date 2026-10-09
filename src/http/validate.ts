@@ -66,3 +66,11 @@ export function redemptionRef(b: Body): string {
   }
   return v;
 }
+
+/** Free-text reason; optional, not stored. */
+export function reason(b: Body): string | undefined {
+  const v = b.reason;
+  if (v === undefined) return undefined;
+  if (typeof v !== 'string' || v.length > 500) throw new BadRequest('invalid_reason', 'reason must be a string of at most 500 characters');
+  return v;
+}

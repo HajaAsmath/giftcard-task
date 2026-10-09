@@ -200,3 +200,49 @@ export async function reloadCard(client: PoolClient, input: ReloadInput): Promis
     balance_minor: await sumBalance(client, card.card_id), occurred_at: input.occurred_at,
   };
 }
+
+export interface ReverseInput {
+  redemption_ref: string;
+  occurred_at: string;
+}
+
+export interface ReversalView {
+  redemption_ref: string;
+  card_number: string;
+  store_id: string;
+  amount_minor: number;
+  balance_minor: number;
+  occurred_at: string;
+}
+
+/**
+ * Undoes a redemption in full. The amount and the store come from the original entry, never from the caller.
+ * A redemption can be reversed once.
+ */
+export async function reverseRedemption(client: PoolClient, input: ReverseInput): Promise<ReversalView> {
+  const { rows: [original] } = await client.query(
+    `SELECT e.entry_id, e.card_id, e.store_id, (-e.amount_minor)::int AS amount_minor, c.card_number
+     FROM ledger_entries e JOIN cards c ON c.card_id = e.card_id
+     WHERE e.redemption_ref = $1 AND e.kind IN ('redeem', 'offline_redeem')`,
+    [input.redemption_ref],
+  );
+  if (!original) throw new NotFound('redemption_not_found', `No redemption ${input.redemption_ref}`);
+
+  await client.query(`SELECT 1 FROM cards WHERE card_id = $1 FOR UPDATE`, [original.card_id]);
+  const { rowCount: alreadyReversed } = await client.query(`SELECT 1 FROM ledger_entries WHERE reverses_entry_id = $1`, [original.entry_id]);
+  if (alreadyReversed) throw new Conflict('already_reversed', `Redemption ${input.redemption_ref} was already reversed`);
+
+  await client.query(
+    `INSERT INTO ledger_entries (card_id, kind, amount_minor, occurred_at, store_id, reverses_entry_id)
+     VALUES ($1, 'reverse', $2, $3, $4, $5)`,
+    [original.card_id, original.amount_minor, input.occurred_at, original.store_id, original.entry_id],
+  ).catch((err) => {
+    if (err.code === '23505') throw new Conflict('already_reversed', `Redemption ${input.redemption_ref} was already reversed`);
+    throw err;
+  });
+  await recomputeBalance(client, original.card_id);
+  return {
+    redemption_ref: input.redemption_ref, card_number: original.card_number, store_id: original.store_id,
+    amount_minor: original.amount_minor, balance_minor: await sumBalance(client, original.card_id), occurred_at: input.occurred_at,
+  };
+}
