@@ -34,7 +34,7 @@ export async function issueCard(client: PoolClient, input: IssueInput): Promise<
 }
 
 export async function getCard(db: Pool | PoolClient, cardNumber: string): Promise<CardView> {
-  return readCard(db, cardNumber);
+  return readCard(db, normaliseCardNumber(cardNumber));
 }
 
 /** The same card arrives with and without spaces. */
