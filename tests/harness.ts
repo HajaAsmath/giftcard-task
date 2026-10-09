@@ -8,6 +8,8 @@ import { createApp } from '../src/http/app';
 export interface Harness {
   baseUrl: string;
   pool: Pool;
+  /** The same database, as the dedicated read-only role the MCP server uses. */
+  readOnlyUrl: string;
   stop(): Promise<void>;
 }
 
@@ -22,6 +24,7 @@ export async function startHarness(): Promise<Harness> {
   return {
     baseUrl: `http://127.0.0.1:${port}`,
     pool,
+    readOnlyUrl: container.getConnectionUri().replace(/\/\/[^@]*@/, '//giftcard_readonly:readonly@'),
     async stop() {
       await new Promise((resolve) => server.close(resolve));
       await pool.end();

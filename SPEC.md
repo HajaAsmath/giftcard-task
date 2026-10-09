@@ -68,7 +68,7 @@ flags: overdrawn_cards      { card_number, store_id, balance_minor, cause }
 
 `refused_movements` leaves out `redemption_ref` so the report is identical whichever of lines 11 and 12 loses the `g1` race.
 
-**MCP.** `liability_report(month, store_id?)` returns the report JSON verbatim. `month` must match `YYYY-MM`; `store_id` is checked against the stores table and an unknown value is refused. It connects as a read-only Postgres role.
+**MCP.** `liability_report(month, store_id?)` returns the report JSON verbatim. `month` must match `YYYY-MM`; `store_id` is checked against the stores table and an unknown value is refused. It connects as a read-only Postgres role (connection string from `MCP_DATABASE_URL`).
 
 ## Code Style
 

@@ -1,5 +1,5 @@
 import { Pool, PoolClient } from 'pg';
-import { BadRequest } from './errors';
+import { BadRequest, NotFound } from './errors';
 
 export const KINDS = ['issue', 'reload', 'redeem', 'reverse', 'offline_redeem'] as const;
 export type Kind = typeof KINDS[number];
@@ -55,14 +55,21 @@ const CLOSING = `
     SELECT card_id, SUM(amount_minor) AS balance FROM entries WHERE month <= $1 GROUP BY card_id
   )`;
 
-/** Point-in-time liability for one month, by issuing store, from ledger entries by occurred_at. */
-export async function liabilityReport(db: Pool | PoolClient, rawMonth: unknown): Promise<LiabilityReport> {
+/**
+ * Point-in-time liability for one month, by issuing store, from ledger entries by occurred_at.
+ * With a store id, the same report is scoped to that store and its card-level flags are left out.
+ */
+export async function liabilityReport(db: Pool | PoolClient, rawMonth: unknown, storeId?: string): Promise<LiabilityReport> {
   const month = parseMonth(rawMonth);
+  if (storeId !== undefined) {
+    const { rowCount } = await db.query('SELECT 1 FROM stores WHERE store_id = $1', [storeId]);
+    if (!rowCount) throw new NotFound('unknown_store', `No store ${storeId}`);
+  }
   if (db instanceof Pool) {
     const client = await db.connect();
     try {
       await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
-      const report = await build(client, month);
+      const report = await build(client, month, storeId);
       await client.query('COMMIT');
       return report;
     } catch (err) {
@@ -72,10 +79,10 @@ export async function liabilityReport(db: Pool | PoolClient, rawMonth: unknown):
       client.release();
     }
   }
-  return build(db, month);
+  return build(db, month, storeId);
 }
 
-async function build(db: PoolClient | Pool, month: string): Promise<LiabilityReport> {
+async function build(db: PoolClient | Pool, month: string, storeId?: string): Promise<LiabilityReport> {
   const q = async (sql: string) => (await db.query(sql, [month])).rows;
 
   const stores = await q(
@@ -149,7 +156,7 @@ async function build(db: PoolClient | Pool, month: string): Promise<LiabilityRep
      ORDER BY r.occurred_at, c.card_number, r.store_id, r.amount_minor, r.code`);
 
   const zero = (): Movements => ({ issue: 0, reload: 0, redeem: 0, reverse: 0, offline_redeem: 0 });
-  const storeRows: StoreLiability[] = stores.map((s) => {
+  const storeRows: StoreLiability[] = stores.filter((s) => storeId === undefined || s.store_id === storeId).map((s) => {
     const b = balances.find((r) => r.store_id === s.store_id);
     const m = zero();
     for (const row of movements.filter((r) => r.store_id === s.store_id)) m[row.kind as Kind] = Number(row.total);
@@ -171,22 +178,26 @@ async function build(db: PoolClient | Pool, month: string): Promise<LiabilityRep
     closing_minor: sum(storeRows.map((s) => s.closing_minor)),
   };
 
+  // A store-scoped report names no other store's cards, and keeps only its own intercompany rows.
+  const cardLevel = <T>(rows: T[]) => (storeId === undefined ? rows : []);
   return {
     month,
     currency: stores[0]?.currency ?? 'AUD',
     stores: storeRows,
     group,
     flags: {
-      overdrawn_cards: overdrawn.map((r) => ({
+      overdrawn_cards: cardLevel(overdrawn.map((r) => ({
         card_number: r.card_number, store_id: r.store_id, balance_minor: Number(r.balance), cause: causeOf(r),
-      })),
-      expired_with_balance: expired.map((r) => ({
+      }))),
+      expired_with_balance: cardLevel(expired.map((r) => ({
         card_number: r.card_number, store_id: r.store_id, balance_minor: Number(r.balance), expired_at: r.expired_at,
-      })),
-      intercompany: intercompany.map((r) => ({ owes: r.owes, owed_to: r.owed_to, amount_minor: Number(r.amount) })),
-      refused_movements: refused.map((r) => ({
+      }))),
+      intercompany: intercompany
+        .filter((r) => storeId === undefined || r.owes === storeId || r.owed_to === storeId)
+        .map((r) => ({ owes: r.owes, owed_to: r.owed_to, amount_minor: Number(r.amount) })),
+      refused_movements: cardLevel(refused.map((r) => ({
         card_number: r.card_number, store_id: r.store_id, amount_minor: Number(r.amount), code: r.code,
-      })),
+      }))),
     },
   };
 }
