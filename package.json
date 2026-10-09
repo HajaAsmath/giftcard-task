@@ -10,7 +10,8 @@
     "dev": "tsx watch src/server.ts",
     "test": "jest --runInBand",
     "typecheck": "tsc --noEmit",
-    "replay": "tsx src/replay.ts"
+    "replay": "tsx src/replay.ts",
+    "verify": "npm run typecheck && npm test && npm test -- --randomize && npm test -- --randomize && npm test -- --randomize"
   },
   "dependencies": {
     "express": "^5.3.0",

@@ -3,6 +3,7 @@ import { Pool, PoolClient } from 'pg';
 import { errorBody, HttpError } from '../errors';
 import { getCard, issueCard, recordConflictingRedemption, recordOfflineBatch, redeemOnline, reloadCard, reverseRedemption } from '../ledger';
 import { idempotent, WriteResult } from '../idempotency';
+import { liabilityReport } from '../report';
 import * as v from './validate';
 
 export function createApp(pool: Pool) {
@@ -31,6 +32,10 @@ export function createApp(pool: Pool) {
 
   app.post('/offline-batches', writeRoute(pool, v.offlineBatch,
     async (client, input) => ({ status: 201, body: await recordOfflineBatch(client, input) })));
+
+  app.get('/reports/liability', async (req, res) => {
+    res.json(await liabilityReport(pool, req.query.month));
+  });
 
   app.get('/cards/:card_number/balance', async (req, res) => {
     res.json(await getCard(pool, req.params.card_number));

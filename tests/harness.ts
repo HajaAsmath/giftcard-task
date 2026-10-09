@@ -141,3 +141,13 @@ export function freshBatch(items: BatchItem[], overrides: Record<string, unknown
     },
   };
 }
+
+export async function getReport(baseUrl: string, month: string) {
+  return get(baseUrl, `/reports/liability?month=${encodeURIComponent(month)}`);
+}
+
+/** Runs `fn` against a fresh container, and always stops it. */
+export async function withHarness<T>(fn: (h: Harness) => Promise<T>): Promise<T> {
+  const h = await startHarness();
+  try { return await fn(h); } finally { await h.stop(); }
+}
