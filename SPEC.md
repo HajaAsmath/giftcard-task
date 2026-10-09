@@ -49,7 +49,7 @@ docs/adr/        → decisions
 
 ## Behaviour
 
-**Ledger.** One append-only table: `card_id`, `kind` (issue, reload, redeem, reverse, offline_redeem), signed `amount_minor`, `occurred_at` (required), `recorded_at` (audit only), `store_id`, `redemption_ref` (unique), `reverses_entry_id`. Nothing is updated. `card.balance_minor` is a cache, recomputed from `SUM(amount_minor)` inside the transaction that holds `SELECT … FOR UPDATE` on the card row.
+**Ledger.** One append-only table: `card_id`, `kind` (issue, reload, redeem, reverse, offline_redeem), signed `amount_minor`, `occurred_at` (required), `recorded_at` (audit only), `store_id`, `redemption_ref` (unique), `reverses_entry_id`, `terminal_id` (offline entries only, so an overdrawn card can be traced to its upload). Nothing is updated. `card.balance_minor` is a cache, recomputed from `SUM(amount_minor)` inside the transaction that holds `SELECT … FOR UPDATE` on the card row.
 
 **Online** writes can be refused: 400 malformed or missing `occurred_at` or key; 403 `invalid_pin`; 404 unknown card; 409 `card_exists` (a second Issue of a Card Number already issued, under a new key), `duplicate_redemption_ref` (a redemption_ref already recorded, under a new key), `idempotency_conflict` or `already_reversed`; 422 `insufficient_funds` or `card_expired`. **Offline** batches are applied whole, atomically, in `occurred_at` order, with balances allowed to go negative. Unique `redemption_ref` stops a batch re-uploaded under a new key.
 

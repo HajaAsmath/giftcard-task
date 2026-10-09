@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { Pool, PoolClient } from 'pg';
 import { errorBody, HttpError } from '../errors';
-import { getCard, issueCard, recordConflictingRedemption, redeemOnline, reloadCard, reverseRedemption } from '../ledger';
+import { getCard, issueCard, recordConflictingRedemption, recordOfflineBatch, redeemOnline, reloadCard, reverseRedemption } from '../ledger';
 import { idempotent, WriteResult } from '../idempotency';
 import * as v from './validate';
 
@@ -28,6 +28,9 @@ export function createApp(pool: Pool) {
     v.reason(b);
     return { redemption_ref: v.redemptionRef(b), occurred_at: v.occurredAt(b) };
   }, async (client, input) => ({ status: 201, body: await reverseRedemption(client, input) })));
+
+  app.post('/offline-batches', writeRoute(pool, v.offlineBatch,
+    async (client, input) => ({ status: 201, body: await recordOfflineBatch(client, input) })));
 
   app.get('/cards/:card_number/balance', async (req, res) => {
     res.json(await getCard(pool, req.params.card_number));

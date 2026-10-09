@@ -111,3 +111,33 @@ export function freshReverse(redeem: FixtureRequest, overrides: Record<string, u
     body: { redemption_ref: (redeem.body as any).redemption_ref, reason: 'order refunded', occurred_at: '2026-09-04T00:00:00Z', ...overrides },
   };
 }
+
+export interface BatchItem {
+  card: FixtureRequest;
+  amount: unknown;
+  occurred_at: string;
+  redemption_ref?: string;
+}
+
+/** An offline batch for cards from `freshIssue`, with a key and redemption_refs no other test uses. */
+export function freshBatch(items: BatchItem[], overrides: Record<string, unknown> = {}): FixtureRequest {
+  seq += 1;
+  const tag = String(seq).padStart(4, '0');
+  return {
+    method: 'POST',
+    path: '/offline-batches',
+    headers: { 'Idempotency-Key': `k-fresh-batch-${tag}` },
+    body: {
+      terminal_id: 't-test-01',
+      store_id: 's1',
+      redemptions: items.map((item, i) => ({
+        card_number: (item.card.body as any).card_number,
+        amount: item.amount,
+        redemption_ref: item.redemption_ref ?? `rd-batch-${tag}-${i}`,
+        order_ref: `o-batch-${tag}-${i}`,
+        occurred_at: item.occurred_at,
+      })),
+      ...overrides,
+    },
+  };
+}

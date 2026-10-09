@@ -1,5 +1,6 @@
 import { Request } from 'express';
 import { BadRequest } from '../errors';
+import { parseAmountToCents } from '../money';
 
 type Body = Record<string, unknown>;
 
@@ -73,4 +74,42 @@ export function reason(b: Body): string | undefined {
   if (v === undefined) return undefined;
   if (typeof v !== 'string' || v.length > 500) throw new BadRequest('invalid_reason', 'reason must be a string of at most 500 characters');
   return v;
+}
+
+export interface OfflineRedemptionInput {
+  card_number: string;
+  amount_minor: number;
+  redemption_ref: string;
+  occurred_at: string;
+}
+
+export interface OfflineBatchInput {
+  terminal_id: string;
+  store_id: string;
+  redemptions: OfflineRedemptionInput[];
+}
+
+const MAX_BATCH = 1000;
+
+export function offlineBatch(b: Body): OfflineBatchInput {
+  const terminal = b.terminal_id;
+  if (typeof terminal !== 'string' || !terminal.trim() || terminal.length > 128) {
+    throw new BadRequest('invalid_terminal_id', 'terminal_id must be a non-empty string');
+  }
+  const store = storeId(b);
+  const list = b.redemptions;
+  if (!Array.isArray(list) || list.length === 0 || list.length > MAX_BATCH) {
+    throw new BadRequest('invalid_batch', `redemptions must be a list of 1 to ${MAX_BATCH} items`);
+  }
+  const redemptions = list.map((item): OfflineRedemptionInput => {
+    if (typeof item !== 'object' || item === null || Array.isArray(item)) {
+      throw new BadRequest('invalid_batch', 'each redemption must be an object');
+    }
+    const r = item as Body;
+    if (typeof r.amount !== 'string') throw new BadRequest('invalid_amount', 'amount must be a decimal string such as "8.29"');
+    const cents = parseAmountToCents(r.amount);
+    if (cents <= 0) throw new BadRequest('invalid_amount', 'amount must be greater than zero');
+    return { card_number: cardNumber(r), amount_minor: cents, redemption_ref: redemptionRef(r), occurred_at: occurredAt(r) };
+  });
+  return { terminal_id: terminal, store_id: store, redemptions };
 }

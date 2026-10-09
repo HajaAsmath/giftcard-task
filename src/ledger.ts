@@ -246,3 +246,53 @@ export async function reverseRedemption(client: PoolClient, input: ReverseInput)
     amount_minor: original.amount_minor, balance_minor: await sumBalance(client, original.card_id), occurred_at: input.occurred_at,
   };
 }
+
+export interface OfflineBatchInput {
+  terminal_id: string;
+  store_id: string;
+  redemptions: { card_number: string; amount_minor: number; redemption_ref: string; occurred_at: string }[];
+}
+
+export interface OfflineBatchView {
+  terminal_id: string;
+  store_id: string;
+  applied: number;
+  cards: { card_number: string; balance_minor: number }[];
+}
+
+/**
+ * Records redemptions a terminal already authorised. The guest has the goods, so nothing is refused:
+ * no PIN, expiry or balance check, and a card may go negative. The whole batch commits or none of it does.
+ */
+export async function recordOfflineBatch(client: PoolClient, input: OfflineBatchInput): Promise<OfflineBatchView> {
+  await requireStore(client, input.store_id);
+  const items = input.redemptions
+    .map((r, index) => ({ ...r, card_number: normaliseCardNumber(r.card_number), index, at: Date.parse(r.occurred_at) }))
+    .sort((a, b) => a.at - b.at || a.index - b.index);
+
+  // Lock every card in one global order (card number), so concurrent batches cannot deadlock.
+  const cardIds = new Map<string, string>();
+  for (const number of [...new Set(items.map((i) => i.card_number))].sort()) {
+    const { rows: [card] } = await client.query(`SELECT card_id FROM cards WHERE card_number = $1 FOR UPDATE`, [number]);
+    if (!card) throw new NotFound('card_not_found', `No gift card ${number}`);
+    cardIds.set(number, card.card_id);
+  }
+
+  for (const item of items) {
+    await client.query(
+      `INSERT INTO ledger_entries (card_id, kind, amount_minor, occurred_at, store_id, redemption_ref, terminal_id)
+       VALUES ($1, 'offline_redeem', $2, $3, $4, $5, $6)`,
+      [cardIds.get(item.card_number), -item.amount_minor, item.occurred_at, input.store_id, item.redemption_ref, input.terminal_id],
+    ).catch((err) => {
+      if (err.code === '23505') throw new Conflict('duplicate_redemption_ref', `redemption_ref ${item.redemption_ref} was already used`);
+      throw err;
+    });
+  }
+
+  const cards: OfflineBatchView['cards'] = [];
+  for (const [number, id] of cardIds) {
+    await recomputeBalance(client, id);
+    cards.push({ card_number: number, balance_minor: await sumBalance(client, id) });
+  }
+  return { terminal_id: input.terminal_id, store_id: input.store_id, applied: items.length, cards };
+}
