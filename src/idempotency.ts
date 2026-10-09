@@ -1,7 +1,6 @@
 import { createHash } from 'node:crypto';
 import { Pool, PoolClient } from 'pg';
-import { Conflict, errorBody, HttpError, Refused } from './errors';
-import { recordRefusedMovement } from './ledger';
+import { Conflict, errorBody, HttpError } from './errors';
 import { keyedPinHash } from './pin';
 
 export interface WriteRequest {
@@ -21,6 +20,14 @@ export interface StoredResponse {
   body: string;
 }
 
+/** What the caller wants recorded alongside an idempotent write. */
+export interface WriteHooks {
+  /** Audit a request whose Idempotency Key was reused for a different body. */
+  onConflict?: (client: PoolClient, fingerprint: string) => Promise<void>;
+  /** Record a refusal, if this kind of refusal is one the caller wants kept. */
+  onRefusal?: (client: PoolClient, err: HttpError, key: string, fingerprint: string) => Promise<void>;
+}
+
 /**
  * Runs `write` at most once per Idempotency Key, in one transaction with the stored outcome.
  *
@@ -32,7 +39,7 @@ export async function idempotent(
   pool: Pool,
   req: WriteRequest,
   write: (client: PoolClient) => Promise<WriteResult>,
-  onConflict?: (client: PoolClient, fingerprint: string) => Promise<void>,
+  hooks?: WriteHooks,
 ): Promise<StoredResponse> {
   const fp = await fingerprint(req);
   const client = await pool.connect();
@@ -45,7 +52,7 @@ export async function idempotent(
     );
     if (claimed.rowCount === 0) {
       await client.query('COMMIT');
-      return replay(client, req.key, fp, onConflict);
+      return replay(client, req.key, fp, hooks);
     }
 
     await client.query('SAVEPOINT write');
@@ -55,7 +62,7 @@ export async function idempotent(
     } catch (err) {
       if (!(err instanceof HttpError)) throw err;
       await client.query('ROLLBACK TO SAVEPOINT write');
-      if (err instanceof Refused) await recordRefusedMovement(client, err.movement, err.code, req.key, fp);
+      await hooks?.onRefusal?.(client, err, req.key, fp);
       result = { status: err.status, body: errorBody(err) };
     }
     const stored = { status: result.status, body: JSON.stringify(result.body) };
@@ -73,15 +80,13 @@ export async function idempotent(
   }
 }
 
-async function replay(
-  client: PoolClient, key: string, fp: string, onConflict?: (client: PoolClient, fingerprint: string) => Promise<void>,
-): Promise<StoredResponse> {
+async function replay(client: PoolClient, key: string, fp: string, hooks?: WriteHooks): Promise<StoredResponse> {
   const { rows: [row] } = await client.query(
     `SELECT fingerprint, status_code, response_body FROM idempotency_keys WHERE key = $1`,
     [key],
   );
   if (row.fingerprint !== fp) {
-    await onConflict?.(client, fp);
+    await hooks?.onConflict?.(client, fp);
     throw new Conflict('idempotency_conflict', `Idempotency-Key ${key} was already used for a different request`);
   }
   return { status: row.status_code, body: row.response_body };

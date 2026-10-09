@@ -142,7 +142,7 @@ export async function redeemOnline(client: PoolClient, input: RedeemInput): Prom
 }
 
 /** Records a declined movement once per (Idempotency Key, request fingerprint). */
-export async function recordRefusedMovement(
+async function recordRefusedMovement(
   client: PoolClient, movement: RefusedMovement, code: string, key: string, fingerprint: string,
 ): Promise<void> {
   await client.query(
@@ -151,6 +151,14 @@ export async function recordRefusedMovement(
      ON CONFLICT (idempotency_key, request_fingerprint) DO NOTHING`,
     [movement.card_id, movement.store_id, movement.amount_minor, code, movement.occurred_at, key, fingerprint],
   );
+}
+
+/** Records a refusal, but only the kind finance should see: a declined redemption attempt. */
+export async function recordRefusalIfMovement(
+  client: PoolClient, err: HttpError, key: string, fingerprint: string,
+): Promise<void> {
+  if (!(err instanceof Refused)) return;
+  await recordRefusedMovement(client, err.movement, err.code, key, fingerprint);
 }
 
 /** Audit of a conflicting key reuse; nothing is recorded if the card or store is unknown. */

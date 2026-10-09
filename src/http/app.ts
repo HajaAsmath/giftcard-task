@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { Pool, PoolClient } from 'pg';
 import { errorBody, HttpError } from '../errors';
-import { getCard, issueCard, recordConflictingRedemption, recordOfflineBatch, redeemOnline, reloadCard, reverseRedemption } from '../ledger';
+import { getCard, issueCard, recordConflictingRedemption, recordOfflineBatch, recordRefusalIfMovement, redeemOnline, reloadCard, reverseRedemption } from '../ledger';
 import { idempotent, WriteResult } from '../idempotency';
 import { liabilityReport } from '../report';
 import * as v from './validate';
@@ -18,8 +18,10 @@ export function createApp(pool: Pool) {
   app.post('/redemptions', writeRoute(pool, (b) => ({
     card_number: v.cardNumber(b), pin: v.pin(b), store_id: v.storeId(b), amount_minor: v.amountMinor(b),
     redemption_ref: v.redemptionRef(b), occurred_at: v.occurredAt(b),
-  }), async (client, input) => ({ status: 201, body: await redeemOnline(client, input) }),
-  (client, input, key, fp) => recordConflictingRedemption(client, input, key, fp)));
+  }), async (client, input) => ({ status: 201, body: await redeemOnline(client, input) }), {
+    onConflict: (client, input, key, fp) => recordConflictingRedemption(client, input, key, fp),
+    onRefusal: (client, _input, err, key, fp) => recordRefusalIfMovement(client, err, key, fp),
+  }));
 
   app.post('/cards/reload', writeRoute(pool, (b) => ({
     card_number: v.cardNumber(b), store_id: v.storeId(b), amount_minor: v.amountMinor(b), occurred_at: v.occurredAt(b),
@@ -58,11 +60,16 @@ export function createApp(pool: Pool) {
 }
 
 /** Parses the request, then runs `write` at most once per Idempotency Key. */
+interface RouteHooks<I> {
+  onConflict?: (client: PoolClient, input: I, key: string, fingerprint: string) => Promise<void>;
+  onRefusal?: (client: PoolClient, input: I, err: HttpError, key: string, fingerprint: string) => Promise<void>;
+}
+
 function writeRoute<I>(
   pool: Pool,
   parse: (body: Record<string, unknown>) => I,
   write: (client: PoolClient, input: I) => Promise<WriteResult>,
-  onConflict?: (client: PoolClient, input: I, key: string, fingerprint: string) => Promise<void>,
+  hooks?: RouteHooks<I>,
 ) {
   return async (req: Request, res: Response) => {
     const key = v.idempotencyKey(req);
@@ -72,7 +79,10 @@ function writeRoute<I>(
       pool,
       { key, method: req.method, path: req.path, body: b },
       (client) => write(client, input),
-      onConflict && ((client, fp) => onConflict(client, input, key, fp)),
+      {
+        onConflict: hooks?.onConflict && ((client, fp) => hooks.onConflict!(client, input, key, fp)),
+        onRefusal: hooks?.onRefusal && ((client, err, k, fp) => hooks.onRefusal!(client, input, err, k, fp)),
+      },
     );
     res.status(out.status).type('application/json').send(out.body);
   };
