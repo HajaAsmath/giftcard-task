@@ -1,5 +1,5 @@
 import { PoolClient, Pool } from 'pg';
-import { BadRequest, NotFound } from './errors';
+import { BadRequest, Conflict, NotFound } from './errors';
 import { hashPin } from './pin';
 
 export interface IssueInput {
@@ -31,7 +31,10 @@ export async function issueCard(client: PoolClient, input: IssueInput): Promise<
      FROM stores s WHERE s.store_id = $3
      RETURNING card_id`,
     [cardNumber, hashPin(input.pin), input.store_id, input.occurred_at],
-  );
+  ).catch((err) => {
+    if (err.code === '23505') throw new Conflict('card_exists', `Gift card ${cardNumber} was already issued`);
+    throw err;
+  });
   if (!card) throw new BadRequest('unknown_store', `No store ${input.store_id}`);
   await client.query(
     `INSERT INTO ledger_entries (card_id, kind, amount_minor, occurred_at, store_id)

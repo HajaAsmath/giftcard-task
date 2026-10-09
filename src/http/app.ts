@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import { Pool } from 'pg';
 import { errorBody, HttpError } from '../errors';
 import { getCard, issueCard } from '../ledger';
+import { idempotent } from '../idempotency';
 import * as v from './validate';
 
 export function createApp(pool: Pool) {
@@ -9,24 +10,17 @@ export function createApp(pool: Pool) {
   app.use(express.json());
 
   app.post('/cards/issue', async (req, res) => {
-    v.idempotencyKey(req);
+    const key = v.idempotencyKey(req);
     const b = v.body(req);
     const input = {
       card_number: v.cardNumber(b), pin: v.pin(b), store_id: v.storeId(b),
       amount_minor: v.amountMinor(b), occurred_at: v.occurredAt(b),
     };
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-      const card = await issueCard(client, input);
-      await client.query('COMMIT');
-      res.status(201).json(card);
-    } catch (err) {
-      await client.query('ROLLBACK');
-      throw err;
-    } finally {
-      client.release();
-    }
+    const out = await idempotent(pool, { key, method: req.method, path: req.path, body: b }, async (client) => ({
+      status: 201,
+      body: await issueCard(client, input),
+    }));
+    res.status(out.status).type('application/json').send(out.body);
   });
 
   app.get('/cards/:card_number/balance', async (req, res) => {
