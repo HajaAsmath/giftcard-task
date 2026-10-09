@@ -1,0 +1,25 @@
+tests/harness.ts
+  s_0a7badbc172fb2::t_98ad4f976b31fe 57-70
+tests/issue-and-balance.test.ts
+  s_0a7badbc172fb2::t_98ad4f976b31fe 1,17-24
+tests/issue-idempotency.test.ts
+  s_0a7badbc172fb2::t_98ad4f976b31fe 1,7,10,18-21,25-29,32,36-38,40,44-48,51,55-60,64-65,68,72,74,77
+AI-NOTES.md
+  s_0a7badbc172fb2::t_a393c959766b89 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "91e62503b6b5fea2cf67f8b7da3cf2f3412075d5",
+  "prompts": {},
+  "sessions": {
+    "s_0a7badbc172fb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf13d64a-5237-4723-acef-56b93b4d9fb0",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
