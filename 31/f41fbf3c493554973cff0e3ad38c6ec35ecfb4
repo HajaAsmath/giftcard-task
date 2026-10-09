@@ -1,0 +1,26 @@
+tests/issue-validation.test.ts
+  s_0a7badbc172fb2::t_636aa351cc079e 1-42
+src/http/app.ts
+  s_0a7badbc172fb2::t_5d988ea4c8fcb2 5,12-17,21,41-42
+  s_0a7badbc172fb2::t_32b7996fe1bc7a 43-44
+src/http/validate.ts
+  s_0a7badbc172fb2::t_5d988ea4c8fcb2 1-60
+src/ledger.ts
+  s_0a7badbc172fb2::t_5d988ea4c8fcb2 2,35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "31f41fbf3c493554973cff0e3ad38c6ec35ecfb4",
+  "prompts": {},
+  "sessions": {
+    "s_0a7badbc172fb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf13d64a-5237-4723-acef-56b93b4d9fb0",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
