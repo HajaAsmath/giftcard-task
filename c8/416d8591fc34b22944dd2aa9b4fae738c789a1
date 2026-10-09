@@ -1,0 +1,26 @@
+src/http/app.ts
+  s_0a7badbc172fb2::t_8df57722aeab94 4,23-25
+  s_0a7badbc172fb2::t_b0308d2b385beb 26
+tests/reload.test.ts
+  s_0a7badbc172fb2::t_3ab0f7a6a1c607 1-126
+src/ledger.ts
+  s_0a7badbc172fb2::t_8df57722aeab94 171-202
+tests/harness.ts
+  s_0a7badbc172fb2::t_3ab0f7a6a1c607 89-101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c8416d8591fc34b22944dd2aa9b4fae738c789a1",
+  "prompts": {},
+  "sessions": {
+    "s_0a7badbc172fb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf13d64a-5237-4723-acef-56b93b4d9fb0",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
