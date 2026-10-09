@@ -79,6 +79,20 @@ test('expiry is checked against occurred_at: line 18 is accepted and line 19 is 
   expect((await get(h.baseUrl, '/cards/6036280000001002/balance')).json.balance_minor).toBe(3500);
 });
 
+test('the expiry instant itself is still spendable, and one millisecond later is not', async () => {
+  // A card sold 2023-09-20 12:00 Sydney expires at 2026-09-20T13:59:59.999Z.
+  const atTheInstant = freshIssue({ occurred_at: '2023-09-20T02:00:00Z' });
+  expect((await send(h.baseUrl, atTheInstant)).status).toBe(201);
+  const at = await send(h.baseUrl, freshRedeem(atTheInstant, 100, { occurred_at: '2026-09-20T13:59:59.999Z' }));
+  expect(at.status).toBe(201);
+
+  const justAfter = freshIssue({ occurred_at: '2023-09-20T02:00:00Z' });
+  expect((await send(h.baseUrl, justAfter)).status).toBe(201);
+  const after = await send(h.baseUrl, freshRedeem(justAfter, 100, { occurred_at: '2026-09-20T14:00:00.000Z' }));
+  expect(after.status).toBe(422);
+  expect(codeOf(after)).toBe('card_expired');
+});
+
 test('lines 11 and 12 sent together give exactly one 201 and one 422, and the balance is 1000', async () => {
   expect((await send(h.baseUrl, fixtureLine(6))).status).toBe(201);
   const results = await Promise.all([send(h.baseUrl, fixtureLine(11)), send(h.baseUrl, fixtureLine(12))]);

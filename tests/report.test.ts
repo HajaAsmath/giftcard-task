@@ -1,4 +1,4 @@
-import { getReport, Harness, startHarness } from './harness';
+import { freshIssue, freshRedeem, getReport, Harness, send, startHarness, withHarness } from './harness';
 import { replayFixtures } from '../src/replay';
 
 let h: Harness;
@@ -111,6 +111,24 @@ test('October still carries the overdrawn and expired balances, with no new refu
   expect(json.flags.intercompany).toEqual([]);
   expect(json.flags.refused_movements).toEqual([]);
 });
+
+test('a cross-store redemption reversed in the same month leaves no intercompany row', () =>
+  withHarness(async (h) => {
+    const card = freshIssue({ store_id: 's1', occurred_at: '2026-09-01T00:00:00Z' });
+    expect((await send(h.baseUrl, card)).status).toBe(201);
+    const redeem = freshRedeem(card, 3000, { store_id: 's2', occurred_at: '2026-09-10T00:00:00Z' });
+    expect((await send(h.baseUrl, redeem)).status).toBe(201);
+    const reversal = await send(h.baseUrl, {
+      method: 'POST', path: '/reversals', headers: { 'Idempotency-Key': 'k-ic-zero' },
+      body: { redemption_ref: (redeem.body as any).redemption_ref, occurred_at: '2026-09-20T00:00:00Z' },
+    });
+    expect(reversal.status).toBe(201);
+
+    const { json } = await getReport(h.baseUrl, '2026-09');
+    // The spend and its return are still visible as movements, but nothing is owed.
+    expect(json.flags.intercompany).toEqual([]);
+    expect(json.stores.find((s: any) => s.store_id === 's1').movements_minor).toMatchObject({ redeem: -3000, reverse: 3000 });
+  }));
 
 test('a month with no activity reports zeros', async () => {
   const { json } = await getReport(h.baseUrl, '2020-01');
