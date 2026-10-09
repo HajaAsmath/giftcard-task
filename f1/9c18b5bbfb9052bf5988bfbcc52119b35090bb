@@ -1,0 +1,26 @@
+AI-NOTES.md
+  s_0a7badbc172fb2::t_7caac6307e067a 9
+migrations/002_card_expiry.sql
+  s_0a7badbc172fb2::t_7caac6307e067a 1-2
+tests/issue-and-balance.test.ts
+  s_0a7badbc172fb2::t_2dc264115e0cc8 27-35,37-38,40
+  s_0a7badbc172fb2::t_7caac6307e067a 36,39
+src/ledger.ts
+  s_0a7badbc172fb2::t_7caac6307e067a 18,25-33,63-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f19c18b5bbfb9052bf5988bfbcc52119b35090bb",
+  "prompts": {},
+  "sessions": {
+    "s_0a7badbc172fb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf13d64a-5237-4723-acef-56b93b4d9fb0",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
