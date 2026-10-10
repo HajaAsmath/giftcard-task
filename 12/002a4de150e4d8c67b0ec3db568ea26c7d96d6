@@ -1,0 +1,21 @@
+src/server.ts
+  h_a22f48b4ae3ec3 5
+README.md
+  h_a22f48b4ae3ec3 7-24,125-136
+  h_a22f48b4ae3ec3 123
+SPEC.md
+  h_a22f48b4ae3ec3 29
+src/replay.ts
+  h_a22f48b4ae3ec3 64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "12002a4de150e4d8c67b0ec3db568ea26c7d96d6",
+  "prompts": {},
+  "humans": {
+    "h_a22f48b4ae3ec3": {
+      "author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
