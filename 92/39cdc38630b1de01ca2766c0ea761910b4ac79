@@ -1,0 +1,33 @@
+AGENTS.md
+  s_f9664ac6bf3134::t_b6bc27d43f52e0 42-44,47-49
+  h_a22f48b4ae3ec3 12
+  s_f9664ac6bf3134::t_b6d8248a1f26ce 4
+README.md
+  s_f9664ac6bf3134::t_b6bc27d43f52e0 9-10,19,106
+  h_a22f48b4ae3ec3 101-102
+AI-NOTES.md
+  s_f9664ac6bf3134::t_b6bc27d43f52e0 29
+.gitignore
+  s_f9664ac6bf3134::t_b6bc27d43f52e0 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9239cdc38630b1de01ca2766c0ea761910b4ac79",
+  "prompts": {},
+  "humans": {
+    "h_a22f48b4ae3ec3": {
+      "author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  },
+  "sessions": {
+    "s_f9664ac6bf3134": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b0139e10-0b8d-46d3-8517-6dbb13edc1e7",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
