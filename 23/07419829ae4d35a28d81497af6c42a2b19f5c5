@@ -1,0 +1,54 @@
+README.md
+  s_f9664ac6bf3134::t_f996b53329a4a8 103-107
+.scratch/giftcard-task/issues/02-redeem-online-safely.md
+  s_67e15c88e6e5a5::t_7cdd70cc09f746 1-17
+.scratch/giftcard-task/issues/07-read-only-mcp-report.md
+  s_67e15c88e6e5a5::t_7cdd70cc09f746 1-15
+.scratch/giftcard-task/issues/05-record-offline-batch.md
+  s_67e15c88e6e5a5::t_7cdd70cc09f746 1-15
+AGENTS.md
+  s_f9664ac6bf3134::t_f996b53329a4a8 68-70
+.scratch/giftcard-task/issues/04-reverse-redemption.md
+  s_67e15c88e6e5a5::t_7cdd70cc09f746 1-14
+.scratch/giftcard-task/issues/01-issue-and-check-balance.md
+  s_67e15c88e6e5a5::t_7cdd70cc09f746 1-8
+  s_67e15c88e6e5a5::t_267bb20176b07d 9-11
+  s_67e15c88e6e5a5::t_1e77fcc843ccfc 12-19
+.scratch/giftcard-task/issues/06-replay-and-report-liability.md
+  s_67e15c88e6e5a5::t_7cdd70cc09f746 1-19
+.scratch/giftcard-task/issues/08-verify-and-finish-handoff.md
+  s_67e15c88e6e5a5::t_7cdd70cc09f746 1-16
+.scratch/giftcard-task/issues/03-reload-gift-card.md
+  s_67e15c88e6e5a5::t_7cdd70cc09f746 1-14
+.gitignore
+  s_f9664ac6bf3134::t_f996b53329a4a8 1,4-6,8-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2307419829ae4d35a28d81497af6c42a2b19f5c5",
+  "prompts": {},
+  "humans": {
+    "h_a22f48b4ae3ec3": {
+      "author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  },
+  "sessions": {
+    "s_67e15c88e6e5a5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "18837858-ca60-48a8-a748-bd950f984cbc",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    },
+    "s_f9664ac6bf3134": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b0139e10-0b8d-46d3-8517-6dbb13edc1e7",
+        "model": "anthropic.valar-auto"
+      },
+      "human_author": "Haja Asmath <hasmath@bigid.com>"
+    }
+  }
+}
