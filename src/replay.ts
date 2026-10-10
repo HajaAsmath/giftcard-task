@@ -61,7 +61,7 @@ function arg(name: string, fallback: string): string {
 }
 
 if (require.main === module) {
-  const baseUrl = arg('--base-url', 'http://localhost:3000').replace(/\/$/, '');
+  const baseUrl = arg('--base-url', 'http://localhost:3100').replace(/\/$/, '');
   const month = arg('--month', '2026-09');
   (async () => {
     const results = await replayFixtures(baseUrl);

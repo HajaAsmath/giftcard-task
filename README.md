@@ -4,6 +4,24 @@ Backend for a restaurant group that sells gift cards at one store and honours th
 reloads, redeems, reverses and records offline batches, and reports the liability each issuing store still owes
 card holders. TypeScript, Express, Postgres, no ORM.
 
+## Run locally
+
+```sh
+npm ci
+docker compose up -d db
+npm run migrate
+npm run dev
+```
+
+The API listens on `http://localhost:3100` by default.
+
+Smoke test:
+
+```sh
+npm run replay -- --base-url http://localhost:3100
+curl "http://localhost:3100/reports/liability?month=2026-09"
+```
+
 ## Commands run
 
 Recorded from the run that produced the numbers below. The dev server ran on port 3100. The test command needs the
@@ -102,5 +120,17 @@ interfaces). `to-tickets` produced the ticket set in `.scratch/giftcard-task/iss
 `code-review-and-quality` for reviewing the code. `spec-driven-development` for writing specs. `AI-NOTES.md` records the mistakes made along the way.
 
 The ticket set is committed for provenance only. In a production repository it would be ignored, together with the
-rest of the local working artifacts: `task.html` (the original brief, which `SPEC.md` supersedes), the scratch
+rest of the local working artifacts: `task.html`, `SPEC.md`, the scratch
 tooling and logs under `.scratch/`, and editor state in `.idea/` and `.vscode/`. `.gitignore` holds that list.
+
+## Production-readiness notes
+
+This proves the ledger behaviour, not the production wrapper. Before real use, add:
+
+- authentication, authorisation and store scoping;
+- secret-managed database credentials and provisioned read-only roles;
+- structured logs, metrics and alerts for refusals, conflicts, overdraws and report latency;
+- deployment, rollback, backup and restore procedures;
+- load tests and query-plan checks for production-sized reports;
+- more database backstops for ledger invariants where practical;
+- CI that runs `npm run verify` against a clean Postgres before release.

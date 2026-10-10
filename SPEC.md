@@ -26,7 +26,7 @@ Install:  npm ci
 Migrate:  npm run migrate
 Dev:      docker compose up -d db && npm run migrate && npm run dev
 Test:     npm test
-Replay:   npm run replay -- --base-url http://localhost:3000
+Replay:   npm run replay -- --base-url http://localhost:3100
 MCP:      npm run mcp
 Typecheck: npm run typecheck
 ```
