@@ -1,5 +1,25 @@
+# Build and install output
 node_modules/
-coverage/
 dist/
+coverage/
+
+# Local configuration and secrets
 .env
+.env.*
+
+# Editor and tool state
+.idea/
+.vscode/
+.serena/
+
+# Local scratch tooling and its output. The ticket set under
+# .scratch/giftcard-task/issues/ is kept, for provenance only (see README).
+.scratch/run/
+.scratch/bak/
+.scratch/mutate.sh
+*.log
+
+# The original take-home brief. SPEC.md supersedes it and the README carries the verdicts.
+task.html
+
 .DS_Store

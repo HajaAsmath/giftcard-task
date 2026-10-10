@@ -65,8 +65,9 @@ A passing suite proves nothing on its own. Both of these have already caught rea
 1. Run the suite shuffled (`npm test -- --randomize`). Tests that pass only in their written order are testing each
    other, not the code.
 2. Break the code on purpose and confirm a test fails. Remove a row lock, ignore a fingerprint, skip a balance
-   recompute. If the tests still pass, they are not testing what you think. `.scratch/mutate.sh` does this: it
-   patches a file, runs the tests, and restores `src/` and `migrations/` from `.scratch/bak`.
+   recompute. If the tests still pass, they are not testing what you think. A small local script makes this quick:
+   back up `src/` and `migrations/`, patch one file, run the tests, restore the backup. Restoring with
+   `git checkout -- src` instead is a trap: it discards uncommitted work (AI-NOTES entry 6).
 3. Prefer a test that creates real contention over one that hopes for it. A two-request race passes even with the
    row lock removed, because one request finishes first. Twenty concurrent requests fail reliably.
 

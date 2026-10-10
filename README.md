@@ -100,3 +100,8 @@ deployment. The API has no auth by design, per the spec's assumption 2.
 `codebase-design` shaped the seams (`ledger.ts`, `report.ts`, `mcp/tool.ts` as plain functions behind thin
 interfaces). `to-tickets` produced the ticket set in `.scratch/giftcard-task/issues/`. `unslop` was used to rewrite
 one skill instruction. `AI-NOTES.md` records the mistakes made along the way.
+
+The ticket set is committed for provenance only. In a production repository it would be ignored, together with the
+rest of the local working artifacts: `task.html` (the original brief, which `SPEC.md` supersedes), the scratch
+tooling and logs under `.scratch/`, and the editor and tool state in `.idea/` and `.serena/`. `.gitignore` holds
+that list.
