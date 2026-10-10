@@ -7,10 +7,9 @@ coverage/
 .env
 .env.*
 
-# Editor and tool state
+# Editor state
 .idea/
 .vscode/
-.serena/
 
 # Local scratch tooling and its output. The ticket set under
 # .scratch/giftcard-task/issues/ is kept, for provenance only (see README).

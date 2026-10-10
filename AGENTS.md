@@ -1,7 +1,7 @@
 # Agent guidance
 
 How to work in this repository. The build loop and its commands live in `.AGENTS.md`; this file is the project
-knowledge an agent needs before changing code. `README.md` has the results, `SPEC.md` the contract,
+knowledge an agent needs before changing code. `README.md` has the results,
 `GLOSSARY.md` the vocabulary, and `docs/adr/` the decisions.
 
 ## Read these first
@@ -9,9 +9,8 @@ knowledge an agent needs before changing code. `README.md` has the results, `SPE
 - `GLOSSARY.md` before naming anything. Use Gift Card, Balance, Liability, Issuing Store, Occurred At, Refused
   Movement as the glossary defines them, and avoid the listed alternatives. If a term changes, change the glossary
   in the same commit.
-- `docs/adr/0001` to `0004` before changing ledger, expiry, offline or idempotency behaviour. ADRs record decisions
+- `docs/adr/0001` to `0005` before changing ledger, expiry, offline or idempotency behaviour. ADRs record decisions
   that contradict the original working notes, and the fixtures win over the notes.
-- `SPEC.md` for error codes, the report shape and the success numbers.
 
 ## Stack
 
@@ -40,12 +39,14 @@ No ORM, no query builder, no hidden transactions. Ask before adding a dependency
 
 ## Tests
 
-`npm test` runs Jest against a real Postgres from Testcontainers, one container per file, real migrations. On this
-machine Docker runs through Colima, so prefix the command:
+`npm test` runs Jest against a real Postgres from Testcontainers, one container per file, real migrations. It works
+as it stands with a default Docker install. If Docker listens somewhere other than `/var/run/docker.sock`, set both
+of these first, because the Postgres container cannot mount the host's socket path:
 
 ```
-DOCKER_HOST=unix:///Users/hasmath/.colima/default/docker.sock \
-TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock npm test
+export DOCKER_HOST=unix://$HOME/<runtime>/default/docker.sock   # the socket your Docker client uses
+export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
+npm test
 ```
 
 Tests go through the HTTP seam. Two exceptions exist and both are deliberate: the report test asserts

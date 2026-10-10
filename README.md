@@ -6,8 +6,8 @@ card holders. TypeScript, Express, Postgres, no ORM.
 
 ## Commands run
 
-Recorded from the run that produced the numbers below. Docker on this machine runs through Colima, so the test
-command needs the two environment variables; the dev server used port 3100 because 3000 was already taken.
+Recorded from the run that produced the numbers below. The dev server ran on port 3100. The test command needs the
+two Docker socket variables in `AGENTS.md` whenever Docker does not listen on `/var/run/docker.sock`.
 
 | Command | Outcome |
 |---|---|
@@ -16,7 +16,7 @@ command needs the two environment variables; the dev server used port 3100 becau
 | `npm run migrate` | `migrations applied`. Run twice, same result: migrations and the store seed are idempotent |
 | `npm run dev` | `gift card ledger listening on :3100` |
 | `npm run replay -- --base-url http://localhost:3100` | 23 lines sent in file order; statuses below. Run twice, report byte-identical |
-| `npm test` | 169 passed, 169 total, against real Postgres. Also run 3 times with `--randomize`, all green |
+| `npm test` | 180 passed, 180 total, against real Postgres. Also run 3 times with `--randomize`, all green |
 | `npm run typecheck` | clean |
 | `npm run mcp` | answered `initialize`, `tools/list` and `tools/call` over stdio. See the caveat below |
 
@@ -98,10 +98,9 @@ deployment. The API has no auth by design, per the spec's assumption 2.
 
 `tdd` and `incremental-implementation` drove the loop: a failing test, the smallest implementation, then a commit.
 `codebase-design` shaped the seams (`ledger.ts`, `report.ts`, `mcp/tool.ts` as plain functions behind thin
-interfaces). `to-tickets` produced the ticket set in `.scratch/giftcard-task/issues/`. `unslop` was used to rewrite
-one skill instruction. `AI-NOTES.md` records the mistakes made along the way.
+interfaces). `to-tickets` produced the ticket set in `.scratch/giftcard-task/issues/`. `grill-with-docs` used to understand the intent.
+`code-review-and-quality` for reviewing the code. `spec-driven-development` for writing specs. `AI-NOTES.md` records the mistakes made along the way.
 
 The ticket set is committed for provenance only. In a production repository it would be ignored, together with the
 rest of the local working artifacts: `task.html` (the original brief, which `SPEC.md` supersedes), the scratch
-tooling and logs under `.scratch/`, and the editor and tool state in `.idea/` and `.serena/`. `.gitignore` holds
-that list.
+tooling and logs under `.scratch/`, and editor state in `.idea/` and `.vscode/`. `.gitignore` holds that list.
